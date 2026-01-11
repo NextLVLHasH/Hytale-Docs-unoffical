@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-4389631952462736";
+const PUBLISHER_ID = "ca-pub-4389631952462736";
 
 // Ad slot IDs from AdSense
 const AD_SLOTS = {
@@ -22,6 +22,10 @@ const AD_SLOTS = {
   article: "4899233101",
   footer: "4443759924",
 };
+
+// Set to true to show placeholder boxes instead of real ads (for testing layout)
+// Change to false once AdSense is approved
+const SHOW_PLACEHOLDERS = true;
 
 export function AdUnit({ slot, format = "auto", className = "" }: AdUnitProps) {
   const adRef = React.useRef<HTMLModElement>(null);
@@ -63,30 +67,46 @@ export function AdUnit({ slot, format = "auto", className = "" }: AdUnitProps) {
   );
 }
 
+// Placeholder component for testing
+function AdPlaceholder({ height, label }: { height: string; label: string }) {
+  return (
+    <div
+      className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20"
+      style={{ height }}
+    >
+      <span className="text-xs text-muted-foreground/50">{label}</span>
+    </div>
+  );
+}
+
 // Discrete sidebar ad - appears at bottom of sidebar
 export function SidebarAd() {
-  if (!AD_SLOTS.sidebar) return null;
-
   return (
     <div className="mt-6 pt-6 border-t border-border">
       <p className="text-[10px] text-muted-foreground/60 mb-2 uppercase tracking-wider">
         Sponsored
       </p>
-      <AdUnit slot={AD_SLOTS.sidebar} format="vertical" />
+      {SHOW_PLACEHOLDERS ? (
+        <AdPlaceholder height="250px" label="Sidebar Ad" />
+      ) : (
+        <AdUnit slot={AD_SLOTS.sidebar} format="vertical" />
+      )}
     </div>
   );
 }
 
 // Discrete article ad - appears after content (in-article format)
 export function ArticleAd() {
-  if (!AD_SLOTS.article) return null;
-
   return (
     <div className="my-10 py-6 border-y border-border/50">
       <p className="text-[10px] text-muted-foreground/50 mb-3 uppercase tracking-wider text-center">
         Sponsored
       </p>
-      <InArticleAd />
+      {SHOW_PLACEHOLDERS ? (
+        <AdPlaceholder height="120px" label="In-Article Ad" />
+      ) : (
+        <InArticleAd />
+      )}
     </div>
   );
 }
@@ -124,14 +144,16 @@ function InArticleAd() {
 
 // Discrete footer ad
 export function FooterAd() {
-  if (!AD_SLOTS.footer) return null;
-
   return (
     <div className="py-4">
       <p className="text-[10px] text-muted-foreground/50 mb-2 uppercase tracking-wider text-center">
         Sponsored
       </p>
-      <AdUnit slot={AD_SLOTS.footer} format="horizontal" />
+      {SHOW_PLACEHOLDERS ? (
+        <AdPlaceholder height="90px" label="Footer Ad" />
+      ) : (
+        <AdUnit slot={AD_SLOTS.footer} format="horizontal" />
+      )}
     </div>
   );
 }
