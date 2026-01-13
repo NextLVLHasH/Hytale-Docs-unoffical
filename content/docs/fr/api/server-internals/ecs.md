@@ -12,6 +12,71 @@ description: Documentation complete du systeme ECS du serveur Hytale
 Cette documentation est une premiere version basee sur l'analyse du code decompile. Elle sera mise a jour regulierement.
 :::
 
+## Qu'est-ce qu'un ECS ?
+
+Un **Entity Component System** est un pattern d'architecture logicielle couramment utilise dans le developpement de jeux. Il est fondamentalement different de la programmation orientee objet traditionnelle et offre des avantages significatifs en termes de performance et de flexibilite.
+
+### Le probleme avec la POO traditionnelle
+
+En programmation orientee objet traditionnelle, vous pourriez creer une hierarchie de classes comme ceci :
+
+```
+GameObject
+├── Character
+│   ├── Player
+│   ├── NPC
+│   └── Enemy
+├── Item
+│   ├── Weapon
+│   └── Consumable
+└── Vehicle
+```
+
+Cela semble logique, mais des problemes apparaissent rapidement :
+- Que faire si un Player peut devenir un Vehicle (comme une monture) ?
+- Que faire si un Item a besoin de points de vie et peut etre attaque ?
+- Ajouter de nouveaux comportements necessite de modifier la hierarchie de classes
+
+### La solution ECS
+
+L'ECS decompose tout en trois concepts simples :
+
+| Concept | Ce que c'est | Exemple |
+|---------|--------------|---------|
+| **Entity** | Juste un numero d'ID | Entite #42 |
+| **Component** | Donnees pures attachees aux entites | `Position(x: 10, y: 5, z: 20)`, `Health(current: 80, max: 100)` |
+| **System** | Logique qui traite les entites avec des composants specifiques | "A chaque tick, reduire la faim des entites avec le composant Hunger" |
+
+**Pensez-y comme un tableur :**
+
+| ID Entite | Position | Vie | Inventaire | IA | Joueur |
+|-----------|----------|-----|------------|----|----|
+| 1 | (10, 5, 20) | 100/100 | 64 items | - | Oui |
+| 2 | (50, 10, 30) | 50/80 | - | Hostile | - |
+| 3 | (0, 0, 0) | - | 10 items | - | - |
+
+- Entite 1 est un Joueur avec position, vie et inventaire
+- Entite 2 est un Ennemi avec position, vie et IA
+- Entite 3 est un Coffre avec juste position et inventaire
+
+### Pourquoi Hytale utilise l'ECS
+
+1. **Performance** : Les entites avec les memes composants sont stockees ensemble en memoire (favorable au cache)
+2. **Flexibilite** : Ajouter/supprimer des comportements a l'execution en ajoutant/supprimant des composants
+3. **Parallelisation** : Les systemes peuvent s'executer sur differents coeurs CPU simultanement
+4. **Modularite** : Les systemes sont independants et peuvent etre ajoutes/supprimes facilement
+
+### Analogie du monde reel
+
+Imaginez que vous organisez une fete et que vous suivez les invites :
+
+- **Approche POO** : Creer differentes classes pour "Invite VIP", "Invite Regulier", "Staff", etc. Que faire pour un VIP qui est aussi Staff ?
+- **Approche ECS** : Chaque personne (entite) a des tags/composants : "ABadgeVIP", "EstStaff", "BesoinParking", etc. Vous pouvez melanger librement.
+
+---
+
+## Implementation ECS d'Hytale
+
 Cette documentation decrit le systeme ECS (Entity Component System) utilise par le serveur Hytale. Ce systeme est responsable de la gestion des entites, de leurs composants et des systemes qui les traitent.
 
 ## Architecture Generale

@@ -12,7 +12,113 @@ description: Complete documentation of the command system for the Hytale server
 This documentation is a first version based on decompiled code analysis. It will be updated regularly.
 :::
 
-## Overview
+## What is a Command System?
+
+A **command system** is the text-based interface that allows players and administrators to interact with the server. When you type `/gamemode creative` in chat, the command system parses your input, validates permissions, and executes the appropriate action.
+
+### How Commands Work
+
+Think of commands like ordering at a restaurant:
+
+```
+/give Steve diamond_sword --quantity=5 --enchanted
+  │     │        │               │           │
+  │     │        │               │           └── Flag (yes/no option)
+  │     │        │               └── Optional argument
+  │     │        └── Required argument
+  │     └── Target (who receives it)
+  └── Command name
+```
+
+The command system handles:
+1. **Parsing**: Breaking the text into pieces
+2. **Validation**: Checking if arguments are valid
+3. **Permissions**: Verifying the sender has access
+4. **Execution**: Running the actual logic
+
+### Anatomy of a Command
+
+Every command has these parts:
+
+| Part | What it does | Example |
+|------|--------------|---------|
+| **Name** | How to call the command | `give`, `teleport`, `ban` |
+| **Aliases** | Alternative names | `tp` for `teleport` |
+| **Arguments** | Data the command needs | Player name, item ID |
+| **Permission** | Who can use it | `hytale.command.give` |
+| **Description** | Help text | "Gives items to players" |
+
+### Sync vs Async Commands
+
+Commands can run in two modes:
+
+| Type | When to use | Example |
+|------|-------------|---------|
+| **Synchronous** | Quick operations that need immediate results | `/kill` - player dies instantly |
+| **Asynchronous** | Slow operations that shouldn't freeze the server | `/backup` - saving world takes time |
+
+**Rule of thumb**: If your command talks to a database, web API, or processes lots of data, make it async.
+
+### Command Arguments Explained
+
+Arguments are the data your command needs. Hytale provides a type-safe system:
+
+```java
+// The command: /heal <player> --amount=50 --fully
+RequiredArg<PlayerRef> targetArg;   // Must provide a player
+OptionalArg<Integer> amountArg;     // Can specify an amount
+FlagArg fullyFlag;                  // Boolean: is --fully present?
+```
+
+| Argument Type | Syntax | When to use |
+|---------------|--------|-------------|
+| **Required** | `<name>` | Must be provided |
+| **Optional** | `--name=value` | Can be omitted |
+| **Default** | `--name=value` | Has a fallback value |
+| **Flag** | `--name` | Yes/no toggle |
+
+### The Permission Hierarchy
+
+Permissions control who can run what:
+
+```
+hytale
+├── command
+│   ├── give          # /give permission
+│   │   └── others    # /give to other players
+│   ├── teleport
+│   │   ├── self      # Teleport yourself
+│   │   └── others    # Teleport other players
+│   └── ban
+│       └── permanent # Permanent bans
+```
+
+Players can have:
+- Specific permissions: `hytale.command.give`
+- Wildcard permissions: `hytale.command.*`
+- Permission groups: `Admin` (which includes many permissions)
+
+### Real-World Analogy: Voice Assistant
+
+Commands work like talking to a voice assistant:
+
+- **"Hey Siri, set a timer for 5 minutes"**
+  - Command: `set timer`
+  - Argument: `5 minutes`
+
+- **"/give Steve diamond 64"**
+  - Command: `give`
+  - Arguments: `Steve`, `diamond`, `64`
+
+Both need to:
+1. Understand what you're asking (parsing)
+2. Check if you're allowed (permissions)
+3. Execute the action
+4. Report back the result
+
+---
+
+## Technical Overview
 
 The Hytale server implements a comprehensive command system located in `com.hypixel.hytale.server.core.command`. This system provides a flexible framework for creating, registering, and executing commands with full support for permissions, arguments, subcommands, and asynchronous execution.
 

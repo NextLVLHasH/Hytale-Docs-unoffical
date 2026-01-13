@@ -12,6 +12,96 @@ description: Documentation complete du systeme de plugins Java pour le serveur H
 Cette documentation est une premiere version basee sur l'analyse du code decompile. Elle sera mise a jour regulierement.
 :::
 
+## Qu'est-ce qu'un plugin ?
+
+Un **plugin** est un morceau de code autonome qui ajoute de nouvelles fonctionnalites au serveur Hytale sans modifier son code source. Pensez aux plugins comme des applications sur votre smartphone - ils etendent les fonctionnalites tandis que le systeme d'exploitation reste inchange.
+
+### Pourquoi utiliser des plugins ?
+
+| Approche | Avantages | Inconvenients |
+|----------|-----------|---------------|
+| **Modifier le code du serveur** | Controle total | Casse aux mises a jour, difficile a partager |
+| **Utiliser des plugins** | Mises a jour faciles, partageables, isoles | Limite a ce que les APIs exposent |
+
+Les plugins sont la methode recommandee pour ajouter des fonctionnalites personnalisees car :
+- Ils survivent aux mises a jour du serveur
+- Plusieurs plugins peuvent fonctionner ensemble
+- Ils peuvent etre actives/desactives sans redemarrer
+- La communaute peut les partager et les reutiliser
+
+### Cycle de vie du plugin : de la naissance a la mort
+
+Chaque plugin passe par un cycle de vie, comme un organisme vivant :
+
+```
+NONE → SETUP → START → ENABLED → SHUTDOWN → DISABLED
+  |       |       |        |          |          |
+Nait   Se      Lance    Pleinement  S'endort    Dort
+       reveille systemes  actif
+```
+
+| Etat | Ce qui se passe | Ce que vous devez faire |
+|------|-----------------|------------------------|
+| **SETUP** | Le plugin se reveille, les dependances sont pretes | Enregistrer commandes, evenements, initialiser ressources |
+| **START** | Tous les plugins sont configures | Charger configurations, connecter aux bases de donnees |
+| **ENABLED** | Le plugin tourne completement | Operation normale |
+| **SHUTDOWN** | Le serveur s'arrete ou le plugin est desactive | Sauvegarder donnees, fermer connexions, nettoyer |
+| **DISABLED** | Le plugin dort | Rien - vous avez fini |
+
+### Analogie du monde reel : cuisine de restaurant
+
+Pensez au serveur Hytale comme une cuisine de restaurant :
+
+- **Serveur** = La cuisine avec tout son equipement
+- **Plugin** = Un chef specialise que vous embauchez
+- **Manifeste** = Le CV du chef (nom, competences, exigences)
+- **Cycle de vie** = Le service du chef (arriver, preparer, cuisiner, nettoyer, partir)
+- **Registres** = Le tableau de menu ou les chefs affichent leurs plats
+
+Comme un chef :
+- Doit suivre les regles de la cuisine (utiliser les registres fournis)
+- Ne peut pas modifier la structure de la cuisine (code du serveur)
+- Doit nettoyer en partant (shutdown proprement)
+- Travaille aux cotes d'autres chefs (autres plugins)
+
+### Le manifeste : la carte d'identite de votre plugin
+
+Chaque plugin a besoin d'un fichier `manifest.json` qui dit au serveur :
+
+```json
+{
+    "Group": "MonStudio",           // Qui l'a fait (votre organisation)
+    "Name": "SuperFonctionnalite",  // Comment il s'appelle
+    "Version": "1.0.0",             // Quelle version
+    "Main": "com.monstudio.Super",  // Ou trouver la classe principale
+    "Dependencies": {               // Ce dont il a besoin pour fonctionner
+        "Hytale:CorePlugin": ">=1.0.0"
+    }
+}
+```
+
+C'est comme une etiquette de colis - le serveur sait ce qu'il y a dedans sans l'ouvrir.
+
+### Pourquoi utiliser les registres au lieu d'un acces direct ?
+
+Vous vous demandez peut-etre pourquoi les plugins utilisent `getCommandRegistry()` au lieu d'acceder directement a `CommandManager`. Voici pourquoi :
+
+```java
+// MAUVAIS : Acces direct
+CommandManager.get().register(new MyCommand());
+// Probleme : Quand votre plugin est desactive, la commande reste enregistree !
+
+// BON : Utiliser le registre
+getCommandRegistry().registerCommand(new MyCommand());
+// Quand votre plugin est desactive, toutes vos commandes sont automatiquement desenregistrees
+```
+
+Les registres suivent tout ce que votre plugin cree et le nettoient automatiquement. C'est comme le checkout d'un hotel - vous n'avez pas besoin de vous rappeler chaque serviette utilisee ; le personnel connait votre chambre et nettoie tout.
+
+---
+
+## Documentation technique
+
 Cette documentation couvre le systeme de plugins du serveur Hytale, permettant aux developpeurs d'etendre les fonctionnalites du serveur via des plugins Java.
 
 ## Table des matieres

@@ -12,9 +12,137 @@ description: Documentation complete des packets reseau du protocole Hytale (200+
 Cette documentation est une premiere version basee sur l'analyse du code decompile. Elle sera mise a jour regulierement.
 :::
 
+## Que sont les packets reseau ?
+
+Quand vous jouez a Hytale, votre ordinateur (le **client**) et le serveur de jeu doivent constamment echanger des informations. Cette communication se fait via des **packets** - de petits paquets de donnees envoyes sur le reseau.
+
+### La danse client-serveur
+
+Chaque action dans un jeu multijoueur implique une communication reseau :
+
+```
+Vous appuyez sur Z pour avancer
+       │
+       ▼
+Votre client envoie : "Le joueur veut avancer"
+       │
+       ▼ (voyage sur internet)
+       │
+       ▼
+Le serveur recoit, valide, calcule la nouvelle position
+       │
+       ▼
+Le serveur envoie : "Le joueur est maintenant a la position (X, Y, Z)"
+       │
+       ▼ (voyage retour)
+       │
+       ▼
+Votre client met a jour votre ecran
+```
+
+Cela se produit **des dizaines de fois par seconde** pour chaque joueur !
+
+### Pourquoi les packets sont importants
+
+Comprendre les packets vous aide a :
+- **Deboguer les problemes reseau** : "Pourquoi mon item personnalise n'apparait pas ?"
+- **Optimiser les performances** : Savoir quels packets sont couteux
+- **Comprendre les limites du jeu** : Pourquoi je ne peux pas envoyer des donnees illimitees ?
+- **Creer des plugins conscients du reseau** : Reagir efficacement aux actions des joueurs
+
+### Anatomie d'un packet
+
+Chaque packet a une structure standard :
+
+```
+┌─────────────────────────────────────────────┐
+│ ID du Packet (1-5 bytes)                    │  ← Quel type de packet ?
+├─────────────────────────────────────────────┤
+│ Bits Null (1-2 bytes)                       │  ← Quels champs optionnels sont presents ?
+├─────────────────────────────────────────────┤
+│ Bloc Fixe (variable)                        │  ← Donnees toujours presentes
+├─────────────────────────────────────────────┤
+│ Bloc Variable (variable)                    │  ← Donnees optionnelles/dynamiques
+└─────────────────────────────────────────────┘
+```
+
+### Analogie du monde reel : courrier postal
+
+Les packets sont comme des lettres dans le courrier :
+
+| Systeme postal | Packets reseau |
+|----------------|----------------|
+| Enveloppe | En-tete du packet (ID, taille) |
+| Adresse expediteur | Identifiant client/serveur |
+| Contenu de la lettre | Donnees du packet (positions, actions) |
+| Code postal | ID du packet (determine le traitement) |
+| Courrier recommande | Packets fiables (doivent arriver) |
+| Carte postale | Packets rapides (peuvent etre perdus) |
+
+### Directions des packets
+
+Les packets circulent dans deux directions :
+
+| Direction | Symbole | Exemple |
+|-----------|---------|---------|
+| **Client → Serveur** | C2S | "J'ai clique a la position X,Y" |
+| **Serveur → Client** | S2C | "Le bloc a X,Y,Z est maintenant Pierre" |
+| **Bidirectionnel** | ↔ | Ping/Pong pour mesurer la latence |
+
+### Categories de packets
+
+Hytale organise plus de 200 packets en groupes logiques :
+
+| Categorie | But | Exemples |
+|-----------|-----|----------|
+| **Connection** (0-3) | Etablir/terminer les connexions | Connect, Disconnect, Ping |
+| **Authentification** (10-18) | Login et permissions | AuthToken, ConnectAccept |
+| **Setup** (20-34) | Chargement initial du monde | WorldSettings, AssetInitialize |
+| **Joueur** (100-119) | Actions du joueur | ClientMovement, MouseInteraction |
+| **Monde/Chunk** (131-166) | Donnees du monde | SetChunk, ServerSetBlock |
+| **Entite** (160-166) | Mises a jour d'entites | EntityUpdates, PlayAnimation |
+| **Inventaire** (170-179) | Gestion d'inventaire | UpdatePlayerInventory, MoveItemStack |
+| **Interface** (210-234) | UI et chat | ChatMessage, Notification |
+
+### Le flux de connexion
+
+Quand vous rejoignez un serveur Hytale, voici ce qui se passe :
+
+```
+1. CLIENT : "Bonjour ! Je veux me connecter" (packet Connect)
+         ↓
+2. SERVEUR : "Qui es-tu ?" (challenge d'authentification)
+         ↓
+3. CLIENT : "Voici mon token" (packet AuthToken)
+         ↓
+4. SERVEUR : "Bienvenue ! Voici les parametres du monde" (ConnectAccept + WorldSettings)
+         ↓
+5. SERVEUR : "Voici les donnees du monde..." (packets SetChunk)
+         ↓
+6. CLIENT : "Je suis pret !" (packet ClientReady)
+         ↓
+7. Les deux : Echangent des packets de mouvement/action en continu
+```
+
+### Compression et optimisation
+
+Les gros packets (comme les donnees de chunks) sont compresses pour economiser la bande passante :
+
+- **Packets compresses** : Donnees de chunk, mises a jour d'assets, lots d'entites
+- **Packets non compresses** : Petits packets frequents comme le mouvement
+
+Le serveur equilibre entre :
+- **Bande passante** : Combien de donnees sont envoyees
+- **Latence** : A quelle vitesse les donnees arrivent
+- **Cout CPU** : La compression prend du temps de traitement
+
+---
+
+## Reference des packets
+
 Documentation complete du protocole reseau Hytale, basee sur l'analyse du code decompile du serveur.
 
-## Vue d'ensemble
+### Apercu technique
 
 Le protocole reseau Hytale utilise un systeme de packets binaires pour la communication client-serveur. Chaque packet possede:
 

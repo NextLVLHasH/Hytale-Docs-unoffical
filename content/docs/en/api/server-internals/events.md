@@ -12,6 +12,99 @@ description: Complete documentation of the EventBus system for the Hytale server
 This documentation is a first version based on decompiled code analysis. It will be updated regularly.
 :::
 
+## What is an Event System?
+
+An **event system** allows different parts of the code to communicate without knowing about each other directly. Instead of calling methods on other objects, code "publishes" events and other code "subscribes" to receive them.
+
+### The Problem Without Events
+
+Imagine you want multiple things to happen when a player joins the server:
+- Send a welcome message
+- Load their inventory from the database
+- Notify their friends they're online
+- Start their daily quest timer
+
+Without events, the connection code would need to know about and call all these systems:
+
+```java
+// Without events - tightly coupled, hard to maintain
+void onPlayerConnect(Player player) {
+    messageSystem.sendWelcome(player);      // Connection knows about messaging
+    database.loadInventory(player);          // Connection knows about database
+    friendSystem.notifyOnline(player);       // Connection knows about friends
+    questSystem.startDailyTimer(player);     // Connection knows about quests
+}
+```
+
+Adding a new feature means modifying the connection code every time.
+
+### The Event Solution
+
+With events, the connection code just announces "a player connected" and anyone interested can react:
+
+```java
+// With events - loosely coupled, easy to extend
+void onPlayerConnect(Player player) {
+    eventBus.dispatch(new PlayerConnectEvent(player));
+    // That's it! Other systems listen for this event
+}
+
+// Somewhere else, completely independent:
+eventBus.register(PlayerConnectEvent.class, event -> sendWelcome(event.getPlayer()));
+eventBus.register(PlayerConnectEvent.class, event -> loadInventory(event.getPlayer()));
+// Add new listeners without touching the connection code!
+```
+
+### Real-World Analogy
+
+Think of events like a **newspaper subscription**:
+
+| Concept | Event System | Newspaper |
+|---------|--------------|-----------|
+| **Publisher** | Code that fires events | Newspaper company |
+| **Event** | The thing that happened | Today's newspaper |
+| **Subscriber** | Code that listens for events | People who subscribed |
+| **EventBus** | The delivery mechanism | Postal service |
+
+- The newspaper doesn't know who its readers are
+- Readers don't need to visit the printing press
+- New readers can subscribe anytime
+- Readers can unsubscribe when they move
+
+### Sync vs Async Events
+
+Hytale supports two types of events:
+
+| Type | When to Use | Real-World Analogy |
+|------|-------------|-------------------|
+| **Synchronous** | When you need an immediate response or want to cancel an action | Phone call - you wait for an answer |
+| **Asynchronous** | When the action can happen in the background | Email - you don't wait for a reply |
+
+**Example**: A chat filter should be **synchronous** (you need to block the message before it's sent), but logging to a database can be **asynchronous** (the player doesn't need to wait for it).
+
+### Event Priorities
+
+Multiple subscribers can listen to the same event. Priorities control who reacts first:
+
+```
+FIRST (highest) → Security checks, validation
+EARLY           → Data transformation, preprocessing
+NORMAL          → Main business logic
+LATE            → Logging, analytics
+LAST (lowest)   → Cleanup, fallback behavior
+```
+
+**Example**: A chat message goes through:
+1. **FIRST**: Spam filter checks (can cancel if spam)
+2. **EARLY**: Censorship filter (modifies bad words)
+3. **NORMAL**: Chat plugin adds [VIP] prefix
+4. **LATE**: Analytics logs the message
+5. **LAST**: Backup system saves chat history
+
+---
+
+## Hytale's Event Implementation
+
 Hytale's event system is built on the publish-subscribe pattern, enabling modules and plugins to respond to in-game actions without being tightly coupled to the server's core code.
 
 ## Architecture

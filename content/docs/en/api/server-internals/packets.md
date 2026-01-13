@@ -12,9 +12,137 @@ description: Complete documentation of Hytale protocol network packets (200+ pac
 This documentation is a first version based on decompiled code analysis. It will be updated regularly.
 :::
 
+## What are Network Packets?
+
+When you play Hytale, your computer (the **client**) and the game server need to constantly exchange information. This communication happens through **packets** - small bundles of data sent over the network.
+
+### The Client-Server Dance
+
+Every action in a multiplayer game involves network communication:
+
+```
+You press W to walk forward
+       │
+       ▼
+Your client sends: "Player wants to move forward"
+       │
+       ▼ (travels over the internet)
+       │
+       ▼
+Server receives, validates, calculates new position
+       │
+       ▼
+Server sends: "Player is now at position (X, Y, Z)"
+       │
+       ▼ (travels back)
+       │
+       ▼
+Your client updates your screen
+```
+
+This happens **dozens of times per second** for every player!
+
+### Why Packets Matter
+
+Understanding packets helps you:
+- **Debug network issues**: "Why does my custom item not appear?"
+- **Optimize performance**: Know which packets are expensive
+- **Understand game limits**: Why can't I send unlimited data?
+- **Create network-aware plugins**: React to player actions efficiently
+
+### Anatomy of a Packet
+
+Every packet has a standard structure:
+
+```
+┌─────────────────────────────────────────────┐
+│ Packet ID (1-5 bytes)                       │  ← Which type of packet?
+├─────────────────────────────────────────────┤
+│ Null Bits (1-2 bytes)                       │  ← Which optional fields are present?
+├─────────────────────────────────────────────┤
+│ Fixed Block (varies)                        │  ← Always-present data
+├─────────────────────────────────────────────┤
+│ Variable Block (varies)                     │  ← Optional/dynamic data
+└─────────────────────────────────────────────┘
+```
+
+### Real-World Analogy: Postal Mail
+
+Packets are like letters in the mail:
+
+| Postal System | Network Packets |
+|---------------|-----------------|
+| Envelope | Packet header (ID, size) |
+| Sender address | Client/server identifier |
+| Letter content | Packet data (positions, actions) |
+| Postal code | Packet ID (determines handling) |
+| Registered mail | Reliable packets (must arrive) |
+| Postcard | Fast packets (can be lost) |
+
+### Packet Directions
+
+Packets flow in two directions:
+
+| Direction | Symbol | Example |
+|-----------|--------|---------|
+| **Client → Server** | C2S | "I clicked at position X,Y" |
+| **Server → Client** | S2C | "The block at X,Y,Z is now Stone" |
+| **Bidirectional** | ↔ | Ping/Pong for latency measurement |
+
+### Packet Categories
+
+Hytale organizes 200+ packets into logical groups:
+
+| Category | Purpose | Examples |
+|----------|---------|----------|
+| **Connection** (0-3) | Establishing/ending connections | Connect, Disconnect, Ping |
+| **Authentication** (10-18) | Login and permissions | AuthToken, ConnectAccept |
+| **Setup** (20-34) | Initial world loading | WorldSettings, AssetInitialize |
+| **Player** (100-119) | Player actions | ClientMovement, MouseInteraction |
+| **World/Chunk** (131-166) | World data | SetChunk, ServerSetBlock |
+| **Entity** (160-166) | Entity updates | EntityUpdates, PlayAnimation |
+| **Inventory** (170-179) | Inventory management | UpdatePlayerInventory, MoveItemStack |
+| **Interface** (210-234) | UI and chat | ChatMessage, Notification |
+
+### The Connection Flow
+
+When you join a Hytale server, here's what happens:
+
+```
+1. CLIENT: "Hello! I want to connect" (Connect packet)
+         ↓
+2. SERVER: "Who are you?" (authentication challenge)
+         ↓
+3. CLIENT: "Here's my token" (AuthToken packet)
+         ↓
+4. SERVER: "Welcome! Here are the world settings" (ConnectAccept + WorldSettings)
+         ↓
+5. SERVER: "Here's the world data..." (SetChunk packets)
+         ↓
+6. CLIENT: "I'm ready!" (ClientReady packet)
+         ↓
+7. Both: Exchange movement/action packets continuously
+```
+
+### Compression and Optimization
+
+Large packets (like chunk data) are compressed to save bandwidth:
+
+- **Compressed packets**: Chunk data, asset updates, entity batches
+- **Uncompressed packets**: Small, frequent packets like movement
+
+The server balances between:
+- **Bandwidth**: How much data is sent
+- **Latency**: How quickly data arrives
+- **CPU cost**: Compression takes processing time
+
+---
+
+## Packet Reference
+
 Comprehensive documentation of the Hytale network protocol, based on analysis of the decompiled server code.
 
-## Overview
+### Technical Overview
 
 The Hytale network protocol uses a binary packet system for client-server communication. Each packet contains:
 

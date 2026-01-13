@@ -12,6 +12,89 @@ description: Documentation of main data types in the Hytale server (BlockType, I
 This documentation is a first version based on decompiled code analysis. It will be updated regularly.
 :::
 
+## What are Data Types?
+
+**Data types** define the structure of every object in Hytale's world. Just like a blueprint defines what a house looks like, data types define what a block, item, or entity "looks like" to the server.
+
+### Why This Matters
+
+When you create a custom sword in Hytale, you're not writing code - you're filling out a data structure:
+
+```json
+{
+  "id": "my_sword",
+  "maxStack": 1,
+  "durability": 250,
+  "weapon": {
+    "damage": 15,
+    "attackSpeed": 1.2
+  }
+}
+```
+
+Understanding data types helps you:
+- Know what properties are available
+- Avoid invalid configurations
+- Understand how the game interprets your content
+
+### The Core Data Types
+
+Hytale's world is built from a few fundamental types:
+
+| Type | What it represents | Example |
+|------|-------------------|---------|
+| **BlockType** | A type of block | Stone, Grass, Custom blocks |
+| **ItemBase** | A type of item | Sword, Potion, Food |
+| **EntityEffect** | A buff or debuff | Poison, Speed boost |
+| **CraftingRecipe** | How to craft things | Combine wood → planks |
+| **Weather** | Weather conditions | Rain, Snow, Clear |
+
+### How Types Connect
+
+These types don't exist in isolation - they reference each other:
+
+```
+BlockType (Ore)
+    └── drops → ItemBase (Diamond)
+                    └── usedIn → CraftingRecipe (Diamond Sword)
+                                      └── output → ItemBase (Diamond Sword)
+                                                       └── applies → EntityEffect (Bleeding)
+```
+
+### Real-World Analogy: LEGO Instructions
+
+Think of data types like LEGO instruction booklets:
+
+- **BlockType** = Instructions for a specific brick
+- **Fields** = Properties like color, size, connection points
+- **Enums** = Predefined options (Red, Blue, Green)
+- **References** = "Use piece #4207" - links to other pieces
+
+Just like LEGO bricks snap together following rules, Hytale data types connect following their schemas.
+
+### Understanding the Tables Below
+
+Each data type is documented with tables showing:
+
+| Column | What it means |
+|--------|---------------|
+| **Field** | The property name |
+| **Type** | What kind of data (string, number, enum, etc.) |
+| **Description** | What this property does |
+
+**Types you'll see:**
+- `String` - Text like "diamond_sword"
+- `int` / `float` / `double` - Numbers (whole or decimal)
+- `boolean` - True/false
+- `EnumName` - One of a predefined set of values
+- `Type[]` - A list of values
+- `Map<Key, Value>` - A dictionary/lookup table
+- `Type?` - Optional (can be null/missing)
+
+---
+
+## Data Type Reference
+
 This documentation describes the primary data types used in the Hytale server, extracted from decompiled code.
 
 ---

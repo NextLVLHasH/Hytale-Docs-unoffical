@@ -12,6 +12,89 @@ description: Documentation des types de donnees principaux du serveur Hytale (Bl
 Cette documentation est une premiere version basee sur l'analyse du code decompile. Elle sera mise a jour regulierement.
 :::
 
+## Que sont les types de donnees ?
+
+Les **types de donnees** definissent la structure de chaque objet dans le monde d'Hytale. Tout comme un plan definit a quoi ressemble une maison, les types de donnees definissent a quoi "ressemble" un bloc, un item ou une entite pour le serveur.
+
+### Pourquoi c'est important
+
+Quand vous creez une epee personnalisee dans Hytale, vous n'ecrivez pas de code - vous remplissez une structure de donnees :
+
+```json
+{
+  "id": "mon_epee",
+  "maxStack": 1,
+  "durability": 250,
+  "weapon": {
+    "damage": 15,
+    "attackSpeed": 1.2
+  }
+}
+```
+
+Comprendre les types de donnees vous aide a :
+- Savoir quelles proprietes sont disponibles
+- Eviter les configurations invalides
+- Comprendre comment le jeu interprete votre contenu
+
+### Les types de donnees principaux
+
+Le monde d'Hytale est construit a partir de quelques types fondamentaux :
+
+| Type | Ce qu'il represente | Exemple |
+|------|---------------------|---------|
+| **BlockType** | Un type de bloc | Pierre, Herbe, Blocs personnalises |
+| **ItemBase** | Un type d'item | Epee, Potion, Nourriture |
+| **EntityEffect** | Un buff ou debuff | Poison, Boost de vitesse |
+| **CraftingRecipe** | Comment fabriquer des choses | Combiner bois → planches |
+| **Weather** | Conditions meteorologiques | Pluie, Neige, Clair |
+
+### Comment les types se connectent
+
+Ces types n'existent pas isolement - ils se referencent mutuellement :
+
+```
+BlockType (Minerai)
+    └── drops → ItemBase (Diamant)
+                    └── usedIn → CraftingRecipe (Epee en diamant)
+                                      └── output → ItemBase (Epee en diamant)
+                                                       └── applies → EntityEffect (Saignement)
+```
+
+### Analogie du monde reel : instructions LEGO
+
+Pensez aux types de donnees comme des livrets d'instructions LEGO :
+
+- **BlockType** = Instructions pour une brique specifique
+- **Champs** = Proprietes comme couleur, taille, points de connexion
+- **Enums** = Options predefinies (Rouge, Bleu, Vert)
+- **References** = "Utilisez la piece #4207" - liens vers d'autres pieces
+
+Tout comme les briques LEGO s'assemblent selon des regles, les types de donnees Hytale se connectent selon leurs schemas.
+
+### Comprendre les tableaux ci-dessous
+
+Chaque type de donnees est documente avec des tableaux montrant :
+
+| Colonne | Ce que ca signifie |
+|---------|-------------------|
+| **Champ** | Le nom de la propriete |
+| **Type** | Quel genre de donnees (string, number, enum, etc.) |
+| **Description** | Ce que cette propriete fait |
+
+**Types que vous verrez :**
+- `String` - Texte comme "diamond_sword"
+- `int` / `float` / `double` - Nombres (entiers ou decimaux)
+- `boolean` - Vrai/faux
+- `NomEnum` - Une valeur parmi un ensemble predefini
+- `Type[]` - Une liste de valeurs
+- `Map<Cle, Valeur>` - Un dictionnaire/table de recherche
+- `Type?` - Optionnel (peut etre null/absent)
+
+---
+
+## Reference des types de donnees
+
 Cette documentation décrit les types de données principaux utilisés dans le serveur Hytale, extraits du code décompilé.
 
 ---

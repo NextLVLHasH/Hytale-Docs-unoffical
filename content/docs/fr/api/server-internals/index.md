@@ -18,6 +18,31 @@ Cette documentation est une **premiere version** generee par analyse du code sou
 **Derniere mise a jour :** 13 janvier 2026
 :::
 
+## Qu'est-ce que cette documentation ?
+
+Cette documentation revele comment le serveur Hytale fonctionne **sous le capot**. Alors que les outils de modding officiels d'Hytale fournissent une interface conviviale pour creer du contenu, comprendre les systemes internes du serveur vous donne le pouvoir de creer des modifications plus sophistiquees et performantes.
+
+### A qui s'adresse cette documentation ?
+
+- **Developpeurs de plugins** qui veulent etendre Hytale au-dela de ce qui est possible avec les outils visuels
+- **Createurs de mods** qui ont besoin d'un controle precis sur les mecaniques de jeu
+- **Passionnes de technique** curieux de savoir comment un serveur de jeu moderne est architecture
+- **Createurs de contenu** qui veulent comprendre le "pourquoi" derriere les comportements du jeu
+
+### Pourquoi apprendre les mecanismes internes ?
+
+Pensez au serveur Hytale comme au moteur d'une voiture. Vous pouvez conduire sans savoir comment le moteur fonctionne, mais un mecanicien qui comprend le moteur peut :
+- Diagnostiquer les problemes plus rapidement
+- Optimiser les performances
+- Ajouter des modifications personnalisees
+- Repousser les limites du possible
+
+De meme, comprendre les mecanismes internes vous permet de :
+- **Deboguer les problemes** en tracant exactement ce qui se passe quand un joueur place un bloc ou subit des degats
+- **Optimiser les performances** en sachant quels systemes sont couteux et comment minimiser leur impact
+- **Creer un gameplay unique** en vous connectant a des systemes non exposes par les API normales
+- **Eviter les pieges courants** en comprenant pourquoi certains patterns fonctionnent et d'autres non
+
 ## A propos de cette documentation
 
 Cette section documente les **mecanismes internes** du serveur Hytale, destines aux developpeurs de plugins avances souhaitant comprendre le fonctionnement en profondeur du serveur.

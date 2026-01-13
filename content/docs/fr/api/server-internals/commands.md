@@ -12,7 +12,113 @@ description: Documentation complete du systeme de commandes pour le serveur Hyta
 Cette documentation est une premiere version basee sur l'analyse du code decompile. Elle sera mise a jour regulierement.
 :::
 
-## Presentation Generale
+## Qu'est-ce qu'un systeme de commandes ?
+
+Un **systeme de commandes** est l'interface textuelle qui permet aux joueurs et administrateurs d'interagir avec le serveur. Quand vous tapez `/gamemode creative` dans le chat, le systeme de commandes analyse votre entree, valide les permissions et execute l'action appropriee.
+
+### Comment fonctionnent les commandes
+
+Pensez aux commandes comme commander dans un restaurant :
+
+```
+/give Steve diamond_sword --quantity=5 --enchanted
+  │     │        │               │           │
+  │     │        │               │           └── Flag (option oui/non)
+  │     │        │               └── Argument optionnel
+  │     │        └── Argument requis
+  │     └── Cible (qui recoit)
+  └── Nom de la commande
+```
+
+Le systeme de commandes gere :
+1. **Analyse** : Decouper le texte en morceaux
+2. **Validation** : Verifier si les arguments sont valides
+3. **Permissions** : Verifier que l'expediteur a acces
+4. **Execution** : Lancer la logique reelle
+
+### Anatomie d'une commande
+
+Chaque commande a ces parties :
+
+| Partie | Ce qu'elle fait | Exemple |
+|--------|-----------------|---------|
+| **Nom** | Comment appeler la commande | `give`, `teleport`, `ban` |
+| **Alias** | Noms alternatifs | `tp` pour `teleport` |
+| **Arguments** | Donnees dont la commande a besoin | Nom du joueur, ID d'item |
+| **Permission** | Qui peut l'utiliser | `hytale.command.give` |
+| **Description** | Texte d'aide | "Donne des items aux joueurs" |
+
+### Commandes Sync vs Async
+
+Les commandes peuvent s'executer en deux modes :
+
+| Type | Quand l'utiliser | Exemple |
+|------|------------------|---------|
+| **Synchrone** | Operations rapides necessitant des resultats immediats | `/kill` - le joueur meurt instantanement |
+| **Asynchrone** | Operations lentes qui ne doivent pas geler le serveur | `/backup` - sauvegarder le monde prend du temps |
+
+**Regle generale** : Si votre commande parle a une base de donnees, une API web ou traite beaucoup de donnees, faites-la async.
+
+### Arguments de commande expliques
+
+Les arguments sont les donnees dont votre commande a besoin. Hytale fournit un systeme type-safe :
+
+```java
+// La commande : /heal <player> --amount=50 --fully
+RequiredArg<PlayerRef> targetArg;   // Doit fournir un joueur
+OptionalArg<Integer> amountArg;     // Peut specifier une quantite
+FlagArg fullyFlag;                  // Boolean : est-ce que --fully est present ?
+```
+
+| Type d'argument | Syntaxe | Quand l'utiliser |
+|-----------------|---------|-----------------|
+| **Required** | `<nom>` | Doit etre fourni |
+| **Optional** | `--nom=valeur` | Peut etre omis |
+| **Default** | `--nom=valeur` | A une valeur par defaut |
+| **Flag** | `--nom` | Bascule oui/non |
+
+### La hierarchie des permissions
+
+Les permissions controlent qui peut executer quoi :
+
+```
+hytale
+├── command
+│   ├── give          # permission /give
+│   │   └── others    # /give a d'autres joueurs
+│   ├── teleport
+│   │   ├── self      # Se teleporter soi-meme
+│   │   └── others    # Teleporter d'autres joueurs
+│   └── ban
+│       └── permanent # Bans permanents
+```
+
+Les joueurs peuvent avoir :
+- Permissions specifiques : `hytale.command.give`
+- Permissions wildcard : `hytale.command.*`
+- Groupes de permissions : `Admin` (qui inclut plusieurs permissions)
+
+### Analogie du monde reel : assistant vocal
+
+Les commandes fonctionnent comme parler a un assistant vocal :
+
+- **"Dis Siri, mets un minuteur de 5 minutes"**
+  - Commande : `set timer`
+  - Argument : `5 minutes`
+
+- **"/give Steve diamond 64"**
+  - Commande : `give`
+  - Arguments : `Steve`, `diamond`, `64`
+
+Les deux doivent :
+1. Comprendre ce que vous demandez (analyse)
+2. Verifier si vous etes autorise (permissions)
+3. Executer l'action
+4. Rapporter le resultat
+
+---
+
+## Apercu technique
 
 Le serveur Hytale implemente un systeme de commandes complet situe dans `com.hypixel.hytale.server.core.command`. Ce systeme fournit un framework flexible pour creer, enregistrer et executer des commandes avec prise en charge des permissions, des arguments, des sous-commandes et de l'execution asynchrone.
 

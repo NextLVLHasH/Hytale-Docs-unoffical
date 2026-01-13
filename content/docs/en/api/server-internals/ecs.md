@@ -12,6 +12,71 @@ description: Complete documentation of the Hytale server ECS system
 This documentation is a first version based on decompiled code analysis. It will be updated regularly.
 :::
 
+## What is an ECS?
+
+An **Entity Component System** is a software architecture pattern commonly used in game development. It's fundamentally different from traditional object-oriented programming and offers significant performance and flexibility benefits.
+
+### The Problem with Traditional OOP
+
+In traditional object-oriented programming, you might create a class hierarchy like this:
+
+```
+GameObject
+├── Character
+│   ├── Player
+│   ├── NPC
+│   └── Enemy
+├── Item
+│   ├── Weapon
+│   └── Consumable
+└── Vehicle
+```
+
+This seems logical, but problems arise quickly:
+- What if a Player can become a Vehicle (like a mount)?
+- What if an Item needs health and can be attacked?
+- Adding new behaviors requires modifying the class hierarchy
+
+### The ECS Solution
+
+ECS breaks everything into three simple concepts:
+
+| Concept | What it is | Example |
+|---------|------------|---------|
+| **Entity** | Just an ID number | Entity #42 |
+| **Component** | Pure data attached to entities | `Position(x: 10, y: 5, z: 20)`, `Health(current: 80, max: 100)` |
+| **System** | Logic that processes entities with specific components | "Every tick, reduce hunger for entities with Hunger component" |
+
+**Think of it like a spreadsheet:**
+
+| Entity ID | Position | Health | Inventory | AI | Player |
+|-----------|----------|--------|-----------|----|----|
+| 1 | (10, 5, 20) | 100/100 | 64 items | - | Yes |
+| 2 | (50, 10, 30) | 50/80 | - | Hostile | - |
+| 3 | (0, 0, 0) | - | 10 items | - | - |
+
+- Entity 1 is a Player with position, health, and inventory
+- Entity 2 is an Enemy with position, health, and AI
+- Entity 3 is a Chest with just position and inventory
+
+### Why Hytale Uses ECS
+
+1. **Performance**: Entities with the same components are stored together in memory (cache-friendly)
+2. **Flexibility**: Add/remove behaviors at runtime by adding/removing components
+3. **Parallelization**: Systems can run on different CPU cores simultaneously
+4. **Modularity**: Systems are independent and can be added/removed easily
+
+### Real-World Analogy
+
+Imagine you're organizing a party and tracking guests:
+
+- **OOP approach**: Create different classes for "VIP Guest", "Regular Guest", "Staff", etc. What about a VIP who is also Staff?
+- **ECS approach**: Each person (entity) has tags/components: "HasVIPBadge", "IsStaff", "NeedsParking", etc. You can mix and match freely.
+
+---
+
+## Hytale's ECS Implementation
+
 This documentation describes the Entity Component System (ECS) used by the Hytale server. This system is responsible for managing entities, their components, and the systems that process them.
 
 ## General Architecture

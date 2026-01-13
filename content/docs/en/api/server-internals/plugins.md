@@ -12,6 +12,96 @@ description: Complete documentation of the Java plugin system for the Hytale ser
 This documentation is a first version based on decompiled code analysis. It will be updated regularly.
 :::
 
+## What is a Plugin?
+
+A **plugin** is a self-contained piece of code that adds new features to the Hytale server without modifying its core source code. Think of plugins like apps on your smartphone - they extend functionality while the operating system remains unchanged.
+
+### Why Use Plugins?
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Modify server code** | Full control | Breaks on updates, hard to share |
+| **Use plugins** | Easy updates, shareable, isolated | Limited to what APIs expose |
+
+Plugins are the recommended way to add custom functionality because:
+- They survive server updates
+- Multiple plugins can work together
+- They can be enabled/disabled without restarting
+- The community can share and reuse them
+
+### Plugin Lifecycle: Birth to Death
+
+Every plugin goes through a lifecycle, like a living organism:
+
+```
+NONE → SETUP → START → ENABLED → SHUTDOWN → DISABLED
+  |       |       |        |          |          |
+Born   Waking  Running  Fully    Going to    Asleep
+       up      systems  active    sleep
+```
+
+| State | What happens | What you should do |
+|-------|--------------|-------------------|
+| **SETUP** | Plugin is waking up, dependencies are ready | Register commands, events, initialize resources |
+| **START** | All plugins are set up | Load configurations, connect to databases |
+| **ENABLED** | Plugin is fully running | Normal operation |
+| **SHUTDOWN** | Server is stopping or plugin is being disabled | Save data, close connections, cleanup |
+| **DISABLED** | Plugin is asleep | Nothing - you're done |
+
+### Real-World Analogy: Restaurant Kitchen
+
+Think of the Hytale server as a restaurant kitchen:
+
+- **Server** = The kitchen with all its equipment
+- **Plugin** = A specialty chef you hire
+- **Manifest** = The chef's resume (name, skills, requirements)
+- **Lifecycle** = Chef's work shift (arrive, prep, cook, clean, leave)
+- **Registries** = The menu board where chefs post their dishes
+
+Just like a chef:
+- Must follow kitchen rules (use the provided registries)
+- Can't modify the kitchen structure (server code)
+- Must clean up when leaving (shutdown properly)
+- Works alongside other chefs (other plugins)
+
+### The Manifest: Your Plugin's ID Card
+
+Every plugin needs a `manifest.json` file that tells the server:
+
+```json
+{
+    "Group": "MyStudio",           // Who made it (your organization)
+    "Name": "CoolFeature",         // What it's called
+    "Version": "1.0.0",            // Which version
+    "Main": "com.mystudio.Cool",   // Where to find the main class
+    "Dependencies": {              // What it needs to work
+        "Hytale:CorePlugin": ">=1.0.0"
+    }
+}
+```
+
+This is like a package label - the server knows what's inside without opening it.
+
+### Why Use Registries Instead of Direct Access?
+
+You might wonder why plugins use `getCommandRegistry()` instead of directly accessing `CommandManager`. Here's why:
+
+```java
+// BAD: Direct access
+CommandManager.get().register(new MyCommand());
+// Problem: When your plugin is disabled, the command stays registered!
+
+// GOOD: Using registry
+getCommandRegistry().registerCommand(new MyCommand());
+// When your plugin is disabled, all your commands are automatically unregistered
+```
+
+Registries track everything your plugin creates and clean it up automatically. It's like a hotel checkout - you don't need to remember every towel you used; the staff knows your room and cleans everything.
+
+---
+
+## Technical Documentation
+
 This documentation covers the Hytale Server Plugin System, which enables developers to extend server functionality through Java plugins.
 
 ## Table of Contents

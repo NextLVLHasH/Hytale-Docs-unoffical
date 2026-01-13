@@ -12,6 +12,99 @@ description: Documentation complete du systeme d'evenements EventBus pour le ser
 Cette documentation est une premiere version basee sur l'analyse du code decompile. Elle sera mise a jour regulierement.
 :::
 
+## Qu'est-ce qu'un systeme d'evenements ?
+
+Un **systeme d'evenements** permet a differentes parties du code de communiquer sans se connaitre directement. Au lieu d'appeler des methodes sur d'autres objets, le code "publie" des evenements et d'autres parties "s'abonnent" pour les recevoir.
+
+### Le probleme sans evenements
+
+Imaginez que vous voulez que plusieurs choses se produisent quand un joueur rejoint le serveur :
+- Envoyer un message de bienvenue
+- Charger son inventaire depuis la base de donnees
+- Notifier ses amis qu'il est en ligne
+- Demarrer son timer de quete quotidienne
+
+Sans evenements, le code de connexion devrait connaitre et appeler tous ces systemes :
+
+```java
+// Sans evenements - fortement couple, difficile a maintenir
+void onPlayerConnect(Player player) {
+    messageSystem.sendWelcome(player);      // Connexion connait messagerie
+    database.loadInventory(player);          // Connexion connait base de donnees
+    friendSystem.notifyOnline(player);       // Connexion connait systeme d'amis
+    questSystem.startDailyTimer(player);     // Connexion connait systeme de quetes
+}
+```
+
+Ajouter une nouvelle fonctionnalite signifie modifier le code de connexion a chaque fois.
+
+### La solution evenementielle
+
+Avec les evenements, le code de connexion annonce simplement "un joueur s'est connecte" et quiconque interesse peut reagir :
+
+```java
+// Avec evenements - faiblement couple, facile a etendre
+void onPlayerConnect(Player player) {
+    eventBus.dispatch(new PlayerConnectEvent(player));
+    // C'est tout ! Les autres systemes ecoutent cet evenement
+}
+
+// Ailleurs, completement independant :
+eventBus.register(PlayerConnectEvent.class, event -> sendWelcome(event.getPlayer()));
+eventBus.register(PlayerConnectEvent.class, event -> loadInventory(event.getPlayer()));
+// Ajoutez de nouveaux listeners sans toucher au code de connexion !
+```
+
+### Analogie du monde reel
+
+Pensez aux evenements comme un **abonnement a un journal** :
+
+| Concept | Systeme d'evenements | Journal |
+|---------|---------------------|---------|
+| **Editeur** | Code qui declenche les evenements | Entreprise de presse |
+| **Evenement** | Ce qui s'est passe | Le journal du jour |
+| **Abonne** | Code qui ecoute les evenements | Personnes abonnees |
+| **EventBus** | Le mecanisme de livraison | Service postal |
+
+- Le journal ne sait pas qui sont ses lecteurs
+- Les lecteurs n'ont pas besoin de visiter l'imprimerie
+- De nouveaux lecteurs peuvent s'abonner a tout moment
+- Les lecteurs peuvent se desabonner quand ils demenagent
+
+### Evenements Sync vs Async
+
+Hytale supporte deux types d'evenements :
+
+| Type | Quand l'utiliser | Analogie |
+|------|------------------|----------|
+| **Synchrone** | Quand vous avez besoin d'une reponse immediate ou voulez annuler une action | Appel telephonique - vous attendez une reponse |
+| **Asynchrone** | Quand l'action peut se faire en arriere-plan | Email - vous n'attendez pas de reponse |
+
+**Exemple** : Un filtre de chat devrait etre **synchrone** (vous devez bloquer le message avant qu'il soit envoye), mais enregistrer dans une base de donnees peut etre **asynchrone** (le joueur n'a pas besoin d'attendre).
+
+### Priorites des evenements
+
+Plusieurs abonnes peuvent ecouter le meme evenement. Les priorites controlent qui reagit en premier :
+
+```
+FIRST (plus haute) → Verifications de securite, validation
+EARLY              → Transformation de donnees, preprocessing
+NORMAL             → Logique metier principale
+LATE               → Logging, analytics
+LAST (plus basse)  → Nettoyage, comportement par defaut
+```
+
+**Exemple** : Un message de chat passe par :
+1. **FIRST** : Filtre anti-spam (peut annuler si spam)
+2. **EARLY** : Filtre de censure (modifie les gros mots)
+3. **NORMAL** : Plugin de chat ajoute prefixe [VIP]
+4. **LATE** : Analytics enregistre le message
+5. **LAST** : Systeme de backup sauvegarde l'historique du chat
+
+---
+
+## Implementation d'Hytale
+
 Le systeme d'evenements d'Hytale est base sur un pattern publish-subscribe (publication-abonnement) qui permet aux modules et plugins de reagir aux actions du jeu sans couplage fort avec le code central du serveur.
 
 ## Architecture
