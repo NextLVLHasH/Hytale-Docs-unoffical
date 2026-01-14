@@ -56,7 +56,7 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
   const preRef = React.useRef<HTMLPreElement>(null);
 
   // Extract language from children's className
-  const childProps = (children as React.ReactElement)?.props;
+  const childProps = (children as React.ReactElement)?.props as { className?: string } | undefined;
   const childClassName = childProps?.className || "";
   const languageMatch = childClassName.match(/language-(\w+)/);
   const language = languageMatch ? languageMatch[1] : "";
