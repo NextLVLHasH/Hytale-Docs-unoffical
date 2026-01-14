@@ -411,6 +411,22 @@
       "content": "Si vous avez des questions concernant cette politique de confidentialite, veuillez nous contacter via notre depot GitHub."
     }
   },
+  "docProgress": {
+    "title": "Documentation en cours",
+    "clickDetails": "Cliquez pour les details",
+    "dialogTitle": "Progression de la Documentation",
+    "dialogDescription": "Nous travaillons activement pour completer la documentation. Certaines sections peuvent etre incompletes ou manquantes.",
+    "overallProgress": "Progression Globale",
+    "breakdown": "Par Categorie",
+    "lastUpdated": "Derniere mise a jour",
+    "categories": {
+      "modules": "Modules Serveur",
+      "commands": "Commandes",
+      "events": "Evenements",
+      "components": "Composants ECS",
+      "packets": "Packets Reseau"
+    }
+  },
   "terms": {
     "title": "Conditions d'Utilisation",
     "lastUpdated": "Derniere mise a jour",

@@ -411,6 +411,22 @@
       "content": "If you have questions about this Privacy Policy, please contact us through our GitHub repository."
     }
   },
+  "docProgress": {
+    "title": "Documentation in Progress",
+    "clickDetails": "Click for details",
+    "dialogTitle": "Documentation Progress",
+    "dialogDescription": "We are actively working on completing the documentation. Some sections may be incomplete or missing.",
+    "overallProgress": "Overall Progress",
+    "breakdown": "By Category",
+    "lastUpdated": "Last updated",
+    "categories": {
+      "modules": "Server Modules",
+      "commands": "Commands",
+      "events": "Events",
+      "components": "ECS Components",
+      "packets": "Network Packets"
+    }
+  },
   "terms": {
     "title": "Terms of Use",
     "lastUpdated": "Last updated",
