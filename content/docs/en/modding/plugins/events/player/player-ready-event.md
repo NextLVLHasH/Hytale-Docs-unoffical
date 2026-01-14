@@ -36,9 +36,10 @@ public class PlayerReadyEvent extends PlayerEvent<String> {
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getPlayerRef` | `public Ref<EntityStore> getPlayerRef()` | Returns the player's entity store reference (inherited) |
-| `getPlayer` | `public Player getPlayer()` | Returns the player object (inherited) |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Returns the player's entity store reference (inherited) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Returns the player object (inherited) |
 | `getReadyId` | `public int getReadyId()` | Returns the ready identifier |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Usage Example
 

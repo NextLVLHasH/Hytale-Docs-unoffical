@@ -45,14 +45,14 @@ public class SwitchActiveSlotEvent extends CancellableEcsEvent {
 
 | Méthode | Type de retour | Ligne | Description |
 |---------|----------------|-------|-------------|
-| `getPreviousSlot()` | `int` | - | Obtient l'index de l'emplacement précédemment actif |
-| `getInventorySectionId()` | `int` | - | Obtient l'identifiant de la section d'inventaire |
-| `getNewSlot()` | `byte` | - | Obtient l'index de l'emplacement cible |
+| `getPreviousSlot()` | `int` | 18 | Obtient l'index de l'emplacement précédemment actif |
+| `getInventorySectionId()` | `int` | 38 | Obtient l'identifiant de la section d'inventaire |
+| `getNewSlot()` | `byte` | 22 | Obtient l'index de l'emplacement cible |
 | `setNewSlot(byte)` | `void` | 26 | Change l'emplacement cible (permet la redirection) |
-| `isServerRequest()` | `boolean` | - | Retourne `true` si initié par le serveur |
+| `isServerRequest()` | `boolean` | 30 | Retourne `true` si initié par le serveur |
 | `isClientRequest()` | `boolean` | 34 | Retourne `true` si initié par le client |
-| `isCancelled()` | `boolean` | - | Retourne si l'événement a ete annulé |
-| `setCancelled(boolean)` | `void` | - | Définit l'etat d'annulation de l'événement |
+| `isCancelled()` | `boolean` | - | Retourne si l'événement a ete annulé (hérité) |
+| `setCancelled(boolean)` | `void` | - | Définit l'etat d'annulation de l'événement (hérité) |
 
 ## Exemple d'utilisation
 

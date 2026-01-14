@@ -45,10 +45,11 @@ public class PlayerCraftEvent extends PlayerEvent<String> {
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getPlayerRef` | `public Ref<EntityStore> getPlayerRef()` | Returns the player's entity store reference (inherited) |
-| `getPlayer` | `public Player getPlayer()` | Returns the player object (inherited) |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Returns the player's entity store reference (inherited) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Returns the player object (inherited) |
 | `getCraftedRecipe` | `public CraftingRecipe getCraftedRecipe()` | Returns the recipe that was crafted |
 | `getQuantity` | `public int getQuantity()` | Returns the number of items produced |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Usage Example
 

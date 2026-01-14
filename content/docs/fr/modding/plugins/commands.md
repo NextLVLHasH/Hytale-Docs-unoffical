@@ -464,16 +464,17 @@ public interface PermissionHolder {
 
 | Commande | Utilisation | Description |
 |----------|-------------|-------------|
-| `/give` | `/give <objet> [--quantity=1] [--metadata=?]` | Donne des objets au joueur |
-| `/gamemode` | `/gamemode <mode>` | Change le mode de jeu (alias : `/gm`) |
+| `/give` | `/give <objet> [quantite] [--metadata=?]` | Donne des objets a vous-meme (alias : `/give <joueur> <objet> [quantite] [--metadata=?]` pour les autres) |
+| `/give armor` | `/give armor <recherche> [--player=?] [--set]` | Donne les armures correspondant a la recherche (utilisez `--set` pour remplacer l'armure existante) |
+| `/gamemode` | `/gamemode <mode> [joueur]` | Change le mode de jeu (alias : `/gm`) |
 | `/kill` | `/kill [joueur]` | Tue le(s) joueur(s) |
 | `/kick` | `/kick <joueur>` | Expulse un joueur du serveur |
 | `/stop` | `/stop [--crash]` | Arrete le serveur (alias : `/shutdown`) |
 | `/help` | `/help [commande]` | Affiche l'aide des commandes (alias : `/?`) |
-| `/sudo` | `/sudo <joueur> <commande...>` | Execute en tant qu'un autre joueur (alias : `/su`) |
-| `/whereami` | `/whereami` | Affiche les informations de position du joueur |
+| `/sudo` | `/sudo <joueur> <commande...>` | Execute en tant qu'un autre joueur (alias : `/su`). Utilisez `*` comme joueur pour cibler tous les joueurs |
+| `/whereami` | `/whereami [joueur]` | Affiche les informations de position du joueur |
 | `/entity` | `/entity <sous-commande>` | Gestion des entites (alias : `/entities`) |
-| `/worldmap` | `/worldmap <sous-commande>` | Operations sur la carte du monde |
+| `/worldmap` | `/worldmap <sous-commande>` | Operations sur la carte du monde (alias : `/map`) |
 
 ## Tokenisation de l'Entree
 

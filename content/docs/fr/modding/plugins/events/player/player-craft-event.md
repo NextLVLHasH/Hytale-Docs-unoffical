@@ -45,10 +45,11 @@ public class PlayerCraftEvent extends PlayerEvent<String> {
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getPlayerRef` | `public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
-| `getPlayer` | `public Player getPlayer()` | Retourne l'objet joueur (hérité) |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Retourne l'objet joueur (hérité) |
 | `getCraftedRecipe` | `public CraftingRecipe getCraftedRecipe()` | Retourne la recette qui a ete fabriquee |
 | `getQuantity` | `public int getQuantity()` | Retourne le nombre d'objets produits |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

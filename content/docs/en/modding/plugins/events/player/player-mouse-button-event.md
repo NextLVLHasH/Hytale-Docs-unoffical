@@ -22,6 +22,15 @@ Fired when a player presses or releases a mouse button. This is a cancellable ev
 
 ```java
 public class PlayerMouseButtonEvent extends PlayerEvent<Void> implements ICancellable {
+   @Nonnull
+   private final PlayerRef playerRef;
+   private final long clientUseTime;
+   private final Item itemInHand;
+   private final Vector3i targetBlock;
+   private final Entity targetEntity;
+   private final Vector2f screenPoint;
+   private final MouseButtonEvent mouseButton;
+   private boolean cancelled;
 ```
 
 ## Fields
@@ -43,9 +52,9 @@ public class PlayerMouseButtonEvent extends PlayerEvent<Void> implements ICancel
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getPlayerRef` | `public Ref<EntityStore> getPlayerRef()` | Returns the player's entity store reference (inherited) |
-| `getPlayer` | `public Player getPlayer()` | Returns the player object (inherited) |
-| `getPlayerRefComponent` | `public PlayerRef getPlayerRefComponent()` | Returns the PlayerRef component |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Returns the player's entity store reference (inherited) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Returns the player object (inherited) |
+| `getPlayerRefComponent` | `@Nonnull public PlayerRef getPlayerRefComponent()` | Returns the PlayerRef component |
 | `getClientUseTime` | `public long getClientUseTime()` | Returns the client timestamp |
 | `getItemInHand` | `public Item getItemInHand()` | Returns the item being held |
 | `getTargetBlock` | `public Vector3i getTargetBlock()` | Returns the targeted block position |
@@ -54,6 +63,7 @@ public class PlayerMouseButtonEvent extends PlayerEvent<Void> implements ICancel
 | `getMouseButton` | `public MouseButtonEvent getMouseButton()` | Returns the mouse button event |
 | `isCancelled` | `public boolean isCancelled()` | Returns whether the event is cancelled |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Cancels or uncancels the event |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Usage Example
 

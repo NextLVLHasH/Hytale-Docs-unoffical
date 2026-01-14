@@ -47,16 +47,17 @@ public class PlayerSetupConnectEvent implements IEvent<Void>, ICancellable {
 | `getUsername` | `public String getUsername()` | Returns the player's username |
 | `getUuid` | `public UUID getUuid()` | Returns the player's UUID |
 | `getAuth` | `public PlayerAuthentication getAuth()` | Returns authentication info |
-| `getReferralData` | `public byte[] getReferralData()` | Returns referral data from previous server |
-| `getReferralSource` | `public HostAddress getReferralSource()` | Returns the referral server address |
+| `getReferralData` | `@Nullable public byte[] getReferralData()` | Returns referral data from previous server (nullable) |
+| `getReferralSource` | `@Nullable public HostAddress getReferralSource()` | Returns the referral server address (nullable) |
 | `isReferralConnection` | `public boolean isReferralConnection()` | Checks if this is a server-to-server transfer |
-| `getClientReferral` | `public ClientReferral getClientReferral()` | Returns client referral info |
+| `getClientReferral` | `@Nullable public ClientReferral getClientReferral()` | Returns client referral info (nullable) |
 | `isCancelled` | `public boolean isCancelled()` | Returns whether the event is cancelled |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Cancels or uncancels the event |
 | `getReason` | `public String getReason()` | Returns the disconnect reason |
 | `setReason` | `public void setReason(String reason)` | Sets the disconnect reason message |
 | `referToServer` | `public void referToServer(@Nonnull String host, int port)` | Redirects player to another server |
 | `referToServer` | `public void referToServer(@Nonnull String host, int port, @Nullable byte[] data)` | Redirects with custom data |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Constants
 

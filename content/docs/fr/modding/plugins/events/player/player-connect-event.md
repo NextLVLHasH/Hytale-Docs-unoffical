@@ -26,6 +26,10 @@ public class PlayerConnectEvent implements IEvent<Void> {
    private final PlayerRef playerRef;
    @Nullable
    private World world;
+
+   public PlayerConnectEvent(@Nonnull Holder<EntityStore> holder, @Nonnull PlayerRef playerRef, @Nullable World world) {
+      // ...
+   }
 ```
 
 ## Champs
@@ -42,9 +46,10 @@ public class PlayerConnectEvent implements IEvent<Void> {
 |---------|-----------|-------------|
 | `getHolder` | `public Holder<EntityStore> getHolder()` | Retourne le conteneur d'entite pour le joueur qui se connecte |
 | `getPlayerRef` | `public PlayerRef getPlayerRef()` | Retourne la reference du joueur qui se connecte |
-| `getPlayer` | `public Player getPlayer()` | **Obsolete** - Retourne l'objet Player directement |
-| `getWorld` | `public World getWorld()` | Retourne le monde dans lequel le joueur va apparaitre |
+| `getPlayer` | `@Nullable @Deprecated public Player getPlayer()` | **Obsolete** - Retourne l'objet Player directement (nullable) |
+| `getWorld` | `@Nullable public World getWorld()` | Retourne le monde dans lequel le joueur va apparaitre (nullable) |
 | `setWorld` | `public void setWorld(@Nullable World world)` | Definit le monde ou le joueur va apparaitre |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

@@ -28,6 +28,7 @@ public class PlayerMouseMotionEvent extends PlayerEvent<Void> implements ICancel
 
 | Champ | Type | Accesseur | Description |
 |-------|------|-----------|-------------|
+| `playerRef` | `Ref<EntityStore>` | `getPlayerRef()` | Référence vers le magasin d'entite du joueur (hérité de PlayerEvent) |
 | `player` | `Player` | `getPlayer()` | L'objet joueur (hérité de PlayerEvent) |
 | `clientUseTime` | `long` | `getClientUseTime()` | Horodatage cote client de l'événement de mouvement |
 | `itemInHand` | `Item` | `getItemInHand()` | L'objet que le joueur tient en main |
@@ -41,7 +42,8 @@ public class PlayerMouseMotionEvent extends PlayerEvent<Void> implements ICancel
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getPlayer` | `public Player getPlayer()` | Retourne l'objet joueur (hérité) |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Retourne l'objet joueur (hérité) |
 | `getClientUseTime` | `public long getClientUseTime()` | Retourne l'horodatage client |
 | `getItemInHand` | `public Item getItemInHand()` | Retourne l'objet tenu en main |
 | `getTargetBlock` | `public Vector3i getTargetBlock()` | Retourne la position du bloc sous le curseur |
@@ -50,6 +52,7 @@ public class PlayerMouseMotionEvent extends PlayerEvent<Void> implements ICancel
 | `getMouseMotion` | `public MouseMotionEvent getMouseMotion()` | Retourne l'événement de mouvement de la souris |
 | `isCancelled` | `public boolean isCancelled()` | Retourne si l'événement est annule |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Annule ou reactive l'événement |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

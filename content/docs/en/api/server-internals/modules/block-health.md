@@ -89,6 +89,10 @@ public class BlockHealthChunk implements Component<ChunkStore> {
 | `getBlockHealth` | `float getBlockHealth(Vector3i block)` | Get the current health of a block (returns 1.0 if not damaged) |
 | `makeBlockFragile` | `void makeBlockFragile(Vector3i blockLocation, float fragileDuration)` | Mark a block as fragile for a duration |
 | `isBlockFragile` | `boolean isBlockFragile(Vector3i block)` | Check if a block is currently fragile |
+| `getBlockHealthMap` | `@Nonnull Map<Vector3i, BlockHealth> getBlockHealthMap()` | Get direct access to the internal map of damaged blocks |
+| `getBlockFragilityMap` | `@Nonnull Map<Vector3i, FragileBlock> getBlockFragilityMap()` | Get direct access to the internal map of fragile blocks |
+| `createBlockDamagePackets` | `void createBlockDamagePackets(@Nonnull List<Packet> list)` | Generate UpdateBlockDamage packets for all damaged blocks (used during chunk loading) |
+| `clone` | `@Nonnull BlockHealthChunk clone()` | Create a deep copy of this component |
 
 ### Damaging Blocks
 

@@ -40,8 +40,8 @@ public class InteractivelyPickupItemEvent extends CancellableEcsEvent {
 
 | Méthode | Type de retour | Ligne | Description |
 |---------|----------------|-------|-------------|
-| `getItemStack()` | `ItemStack` | - | Obtient la pile d'objets ramassee |
-| `setItemStack(ItemStack)` | `void` | 20 | Remplace la pile d'objets (permet la modification) |
+| `getItemStack()` | `@Nonnull ItemStack` | 16 | Obtient la pile d'objets ramassee |
+| `setItemStack(@Nonnull ItemStack)` | `void` | 20 | Remplace la pile d'objets (permet la modification) |
 | `isCancelled()` | `boolean` | - | Retourne si l'événement a ete annule |
 | `setCancelled(boolean)` | `void` | - | Definit l'etat d'annulation de l'événement |
 

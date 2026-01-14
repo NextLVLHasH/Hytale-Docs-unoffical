@@ -45,14 +45,14 @@ public class SwitchActiveSlotEvent extends CancellableEcsEvent {
 
 | Method | Return Type | Line | Description |
 |--------|-------------|------|-------------|
-| `getPreviousSlot()` | `int` | - | Gets the previously active slot index |
-| `getInventorySectionId()` | `int` | - | Gets the inventory section identifier |
-| `getNewSlot()` | `byte` | - | Gets the target slot index |
+| `getPreviousSlot()` | `int` | 18 | Gets the previously active slot index |
+| `getInventorySectionId()` | `int` | 38 | Gets the inventory section identifier |
+| `getNewSlot()` | `byte` | 22 | Gets the target slot index |
 | `setNewSlot(byte)` | `void` | 26 | Changes the target slot (allows redirection) |
-| `isServerRequest()` | `boolean` | - | Returns `true` if server-initiated |
+| `isServerRequest()` | `boolean` | 30 | Returns `true` if server-initiated |
 | `isClientRequest()` | `boolean` | 34 | Returns `true` if client-initiated |
-| `isCancelled()` | `boolean` | - | Returns whether the event has been cancelled |
-| `setCancelled(boolean)` | `void` | - | Sets the cancelled state of the event |
+| `isCancelled()` | `boolean` | - | Returns whether the event has been cancelled (inherited) |
+| `setCancelled(boolean)` | `void` | - | Sets the cancelled state of the event (inherited) |
 
 ## Usage Example
 

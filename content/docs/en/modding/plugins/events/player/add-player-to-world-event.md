@@ -22,6 +22,11 @@ Fired when a player is being added to a world. This event allows plugins to cont
 
 ```java
 public class AddPlayerToWorldEvent implements IEvent<String> {
+   @Nonnull
+   private final Holder<EntityStore> holder;
+   @Nonnull
+   private final World world;
+   private boolean broadcastJoinMessage = true;
 ```
 
 ## Fields
@@ -36,10 +41,11 @@ public class AddPlayerToWorldEvent implements IEvent<String> {
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getHolder` | `public Holder<EntityStore> getHolder()` | Returns the entity holder for the player |
-| `getWorld` | `public World getWorld()` | Returns the world being joined |
+| `getHolder` | `@Nonnull public Holder<EntityStore> getHolder()` | Returns the entity holder for the player |
+| `getWorld` | `@Nonnull public World getWorld()` | Returns the world being joined |
 | `shouldBroadcastJoinMessage` | `public boolean shouldBroadcastJoinMessage()` | Returns whether a join message will be broadcast |
 | `setBroadcastJoinMessage` | `public void setBroadcastJoinMessage(boolean broadcastJoinMessage)` | Sets whether to broadcast a join message |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Usage Example
 

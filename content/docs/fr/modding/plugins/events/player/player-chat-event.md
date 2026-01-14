@@ -40,16 +40,17 @@ public class PlayerChatEvent implements IAsyncEvent<String>, ICancellable {
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getSender` | `public PlayerRef getSender()` | Retourne le joueur qui a envoye le message |
+| `getSender` | `@Nonnull public PlayerRef getSender()` | Retourne le joueur qui a envoye le message |
 | `setSender` | `public void setSender(@Nonnull PlayerRef sender)` | Change l'expediteur du message |
-| `getTargets` | `public List<PlayerRef> getTargets()` | Retourne la liste des destinataires du message |
+| `getTargets` | `@Nonnull public List<PlayerRef> getTargets()` | Retourne la liste des destinataires du message |
 | `setTargets` | `public void setTargets(@Nonnull List<PlayerRef> targets)` | Definit la liste des destinataires du message |
-| `getContent` | `public String getContent()` | Retourne le contenu du message du chat |
+| `getContent` | `@Nonnull public String getContent()` | Retourne le contenu du message du chat |
 | `setContent` | `public void setContent(@Nonnull String content)` | Modifie le contenu du message du chat |
-| `getFormatter` | `public PlayerChatEvent.Formatter getFormatter()` | Retourne le formateur de message |
+| `getFormatter` | `@Nonnull public PlayerChatEvent.Formatter getFormatter()` | Retourne le formateur de message |
 | `setFormatter` | `public void setFormatter(@Nonnull PlayerChatEvent.Formatter formatter)` | Definit un formateur de message personnalise |
 | `isCancelled` | `public boolean isCancelled()` | Retourne si l'événement est annule |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Annule ou reactive l'événement |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Classes internes
 

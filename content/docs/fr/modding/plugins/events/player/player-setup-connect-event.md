@@ -47,16 +47,17 @@ public class PlayerSetupConnectEvent implements IEvent<Void>, ICancellable {
 | `getUsername` | `public String getUsername()` | Retourne le nom d'utilisateur du joueur |
 | `getUuid` | `public UUID getUuid()` | Retourne l'UUID du joueur |
 | `getAuth` | `public PlayerAuthentication getAuth()` | Retourne les informations d'authentification |
-| `getReferralData` | `public byte[] getReferralData()` | Retourne les donnees de redirection du serveur precedent |
-| `getReferralSource` | `public HostAddress getReferralSource()` | Retourne l'adresse du serveur de redirection |
+| `getReferralData` | `@Nullable public byte[] getReferralData()` | Retourne les donnees de redirection du serveur precedent (nullable) |
+| `getReferralSource` | `@Nullable public HostAddress getReferralSource()` | Retourne l'adresse du serveur de redirection (nullable) |
 | `isReferralConnection` | `public boolean isReferralConnection()` | Verifie s'il s'agit d'un transfert serveur-a-serveur |
-| `getClientReferral` | `public ClientReferral getClientReferral()` | Retourne les informations de redirection client |
+| `getClientReferral` | `@Nullable public ClientReferral getClientReferral()` | Retourne les informations de redirection client (nullable) |
 | `isCancelled` | `public boolean isCancelled()` | Retourne si l'événement est annule |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Annule ou reactive l'événement |
 | `getReason` | `public String getReason()` | Retourne la raison de deconnexion |
 | `setReason` | `public void setReason(String reason)` | Definit le message de raison de deconnexion |
 | `referToServer` | `public void referToServer(@Nonnull String host, int port)` | Redirige le joueur vers un autre serveur |
 | `referToServer` | `public void referToServer(@Nonnull String host, int port, @Nullable byte[] data)` | Redirige avec des donnees personnalisees |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Constantes
 

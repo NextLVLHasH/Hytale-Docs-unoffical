@@ -41,6 +41,7 @@ public class DrainPlayerFromWorldEvent implements IEvent<String> {
 | `getTransform` | `public Transform getTransform()` | Retourne la transformation de destination |
 | `setWorld` | `public void setWorld(World world)` | Definit le monde de destination |
 | `setTransform` | `public void setTransform(Transform transform)` | Definit la transformation de destination |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

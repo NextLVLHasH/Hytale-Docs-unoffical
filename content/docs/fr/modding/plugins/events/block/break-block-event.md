@@ -29,17 +29,17 @@ public class BreakBlockEvent extends CancellableEcsEvent {
 | Champ | Type | Accesseur | Description |
 |-------|------|-----------|-------------|
 | `itemInHand` | `@Nullable ItemStack` | `getItemInHand()` | L'objet que l'entite tient lorsqu'elle casse le bloc (null si aucun objet en main) |
-| `targetBlock` | `Vector3i` | `getTargetBlock()` | La position du bloc en cours de destruction |
-| `blockType` | `BlockType` | `getBlockType()` | Le type de bloc en cours de destruction |
+| `targetBlock` | `@Nonnull Vector3i` | `getTargetBlock()` | La position du bloc en cours de destruction |
+| `blockType` | `@Nonnull BlockType` | `getBlockType()` | Le type de bloc en cours de destruction |
 
 ## Méthodes
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
 | `getItemInHand` | `@Nullable public ItemStack getItemInHand()` | Retourne l'objet tenu par l'entite qui casse le bloc, ou null si aucun objet en main |
-| `getTargetBlock` | `public Vector3i getTargetBlock()` | Retourne la position dans le monde du bloc cible |
+| `getTargetBlock` | `@Nonnull public Vector3i getTargetBlock()` | Retourne la position dans le monde du bloc cible |
 | `setTargetBlock` | `public void setTargetBlock(@Nonnull Vector3i targetBlock)` | Change la position du bloc cible (ligne 39) |
-| `getBlockType` | `public BlockType getBlockType()` | Retourne le type de bloc en cours de destruction |
+| `getBlockType` | `@Nonnull public BlockType getBlockType()` | Retourne le type de bloc en cours de destruction |
 | `isCancelled` | `public boolean isCancelled()` | Retourne si l'événement a ete annule (hérité) |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Definit l'etat d'annulation de l'événement (hérité) |
 

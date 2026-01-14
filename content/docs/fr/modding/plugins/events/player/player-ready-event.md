@@ -36,9 +36,10 @@ public class PlayerReadyEvent extends PlayerEvent<String> {
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getPlayerRef` | `public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
-| `getPlayer` | `public Player getPlayer()` | Retourne l'objet joueur (hérité) |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Retourne l'objet joueur (hérité) |
 | `getReadyId` | `public int getReadyId()` | Retourne l'identifiant de preparation |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

@@ -43,7 +43,7 @@ public abstract class CraftRecipeEvent extends CancellableEcsEvent {
 
 | Méthode | Type de retour | Description |
 |---------|----------------|-------------|
-| `getCraftedRecipe()` | `CraftingRecipe` | Obtient la recette en cours d'execution |
+| `getCraftedRecipe()` | `@Nonnull CraftingRecipe` | Obtient la recette en cours d'execution |
 | `getQuantity()` | `int` | Obtient la quantite de fabrication (taille du lot) |
 | `isCancelled()` | `boolean` | Retourne si l'événement a ete annulé |
 | `setCancelled(boolean)` | `void` | Définit l'etat d'annulation de l'événement |
@@ -57,7 +57,7 @@ Déclenché **avant** que l'operation de fabrication soit exécutée. Annuler ce
 **Source :** Ligne 32
 
 ```java
-public static class Pre extends CraftRecipeEvent {
+public static final class Pre extends CraftRecipeEvent {
     public Pre(@Nonnull CraftingRecipe craftedRecipe, int quantity) {
         super(craftedRecipe, quantity);
     }
@@ -77,7 +77,7 @@ Déclenché **apres** que l'operation de fabrication a ete complétée avec succ
 **Source :** Ligne 26
 
 ```java
-public static class Post extends CraftRecipeEvent {
+public static final class Post extends CraftRecipeEvent {
     public Post(@Nonnull CraftingRecipe craftedRecipe, int quantity) {
         super(craftedRecipe, quantity);
     }

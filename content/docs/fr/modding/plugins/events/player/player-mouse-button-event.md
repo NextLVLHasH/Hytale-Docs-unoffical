@@ -22,6 +22,15 @@ Déclenché lorsqu'un joueur appuie ou relache un bouton de la souris. C'est un 
 
 ```java
 public class PlayerMouseButtonEvent extends PlayerEvent<Void> implements ICancellable {
+   @Nonnull
+   private final PlayerRef playerRef;
+   private final long clientUseTime;
+   private final Item itemInHand;
+   private final Vector3i targetBlock;
+   private final Entity targetEntity;
+   private final Vector2f screenPoint;
+   private final MouseButtonEvent mouseButton;
+   private boolean cancelled;
 ```
 
 ## Champs
@@ -43,9 +52,9 @@ public class PlayerMouseButtonEvent extends PlayerEvent<Void> implements ICancel
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getPlayerRef` | `public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
-| `getPlayer` | `public Player getPlayer()` | Retourne l'objet joueur (hérité) |
-| `getPlayerRefComponent` | `public PlayerRef getPlayerRefComponent()` | Retourne le composant PlayerRef |
+| `getPlayerRef` | `@Nonnull public Ref<EntityStore> getPlayerRef()` | Retourne la reference du magasin d'entite du joueur (hérité) |
+| `getPlayer` | `@Nonnull public Player getPlayer()` | Retourne l'objet joueur (hérité) |
+| `getPlayerRefComponent` | `@Nonnull public PlayerRef getPlayerRefComponent()` | Retourne le composant PlayerRef |
 | `getClientUseTime` | `public long getClientUseTime()` | Retourne l'horodatage client |
 | `getItemInHand` | `public Item getItemInHand()` | Retourne l'objet tenu en main |
 | `getTargetBlock` | `public Vector3i getTargetBlock()` | Retourne la position du bloc cible |
@@ -54,6 +63,7 @@ public class PlayerMouseButtonEvent extends PlayerEvent<Void> implements ICancel
 | `getMouseButton` | `public MouseButtonEvent getMouseButton()` | Retourne l'événement du bouton de la souris |
 | `isCancelled` | `public boolean isCancelled()` | Retourne si l'événement est annule |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Annule ou reactive l'événement |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

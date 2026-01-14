@@ -29,8 +29,8 @@ public class DamageBlockEvent extends CancellableEcsEvent {
 | Champ | Type | Accesseur | Description |
 |-------|------|-----------|-------------|
 | `itemInHand` | `@Nullable ItemStack` | `getItemInHand()` | L'objet/outil utilise pour endommager le bloc (null si aucun objet en main) |
-| `targetBlock` | `Vector3i` | `getTargetBlock()` | La position du bloc endommage |
-| `blockType` | `BlockType` | `getBlockType()` | Le type de bloc endommage |
+| `targetBlock` | `@Nonnull Vector3i` | `getTargetBlock()` | La position du bloc endommage |
+| `blockType` | `@Nonnull BlockType` | `getBlockType()` | Le type de bloc endommage |
 | `currentDamage` | `float` | `getCurrentDamage()` | Les degats accumules sur le bloc avant ce coup |
 | `damage` | `float` | `getDamage()` | La quantite de degats appliquee dans cet événement |
 
@@ -39,9 +39,9 @@ public class DamageBlockEvent extends CancellableEcsEvent {
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
 | `getItemInHand` | `@Nullable public ItemStack getItemInHand()` | Retourne l'outil/objet utilise pour endommager le bloc, ou null si aucun objet en main |
-| `getTargetBlock` | `public Vector3i getTargetBlock()` | Retourne la position dans le monde du bloc cible |
+| `getTargetBlock` | `@Nonnull public Vector3i getTargetBlock()` | Retourne la position dans le monde du bloc cible |
 | `setTargetBlock` | `public void setTargetBlock(@Nonnull Vector3i targetBlock)` | Change la position du bloc cible (ligne 38) |
-| `getBlockType` | `public BlockType getBlockType()` | Retourne le type de bloc endommage |
+| `getBlockType` | `@Nonnull public BlockType getBlockType()` | Retourne le type de bloc endommage |
 | `getCurrentDamage` | `public float getCurrentDamage()` | Retourne les degats deja accumules sur le bloc |
 | `getDamage` | `public float getDamage()` | Retourne la quantite de degats appliquee |
 | `setDamage` | `public void setDamage(float damage)` | Modifie la quantite de degats a appliquer (ligne 55) |

@@ -29,17 +29,17 @@ public class PlaceBlockEvent extends CancellableEcsEvent {
 | Field | Type | Accessor | Description |
 |-------|------|----------|-------------|
 | `itemInHand` | `@Nullable ItemStack` | `getItemInHand()` | The item (block) being placed from the entity's hand (null if no item in hand) |
-| `targetBlock` | `Vector3i` | `getTargetBlock()` | The position where the block will be placed |
-| `rotation` | `RotationTuple` | `getRotation()` | The rotation/orientation of the placed block |
+| `targetBlock` | `@Nonnull Vector3i` | `getTargetBlock()` | The position where the block will be placed |
+| `rotation` | `@Nonnull RotationTuple` | `getRotation()` | The rotation/orientation of the placed block |
 
 ## Methods
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
 | `getItemInHand` | `@Nullable public ItemStack getItemInHand()` | Returns the item stack being used to place the block, or null if no item in hand |
-| `getTargetBlock` | `public Vector3i getTargetBlock()` | Returns the world position where the block will be placed |
+| `getTargetBlock` | `@Nonnull public Vector3i getTargetBlock()` | Returns the world position where the block will be placed |
 | `setTargetBlock` | `public void setTargetBlock(@Nonnull Vector3i targetBlock)` | Changes the target placement position (line 35) |
-| `getRotation` | `public RotationTuple getRotation()` | Returns the rotation tuple for block orientation |
+| `getRotation` | `@Nonnull public RotationTuple getRotation()` | Returns the rotation tuple for block orientation |
 | `setRotation` | `public void setRotation(@Nonnull RotationTuple rotation)` | Changes the block's rotation/orientation (line 45) |
 | `isCancelled` | `public boolean isCancelled()` | Returns whether the event has been cancelled (inherited) |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Sets the cancelled state of the event (inherited) |

@@ -26,6 +26,10 @@ public class PlayerConnectEvent implements IEvent<Void> {
    private final PlayerRef playerRef;
    @Nullable
    private World world;
+
+   public PlayerConnectEvent(@Nonnull Holder<EntityStore> holder, @Nonnull PlayerRef playerRef, @Nullable World world) {
+      // ...
+   }
 ```
 
 ## Fields
@@ -42,9 +46,10 @@ public class PlayerConnectEvent implements IEvent<Void> {
 |--------|-----------|-------------|
 | `getHolder` | `public Holder<EntityStore> getHolder()` | Returns the entity holder for the connecting player |
 | `getPlayerRef` | `public PlayerRef getPlayerRef()` | Returns the player reference for the connecting player |
-| `getPlayer` | `public Player getPlayer()` | **Deprecated** - Returns the Player object directly |
-| `getWorld` | `public World getWorld()` | Returns the world the player will spawn into |
+| `getPlayer` | `@Nullable @Deprecated public Player getPlayer()` | **Deprecated** - Returns the Player object directly (nullable) |
+| `getWorld` | `@Nullable public World getWorld()` | Returns the world the player will spawn into (nullable) |
 | `setWorld` | `public void setWorld(@Nullable World world)` | Sets the world where the player will spawn |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Usage Example
 

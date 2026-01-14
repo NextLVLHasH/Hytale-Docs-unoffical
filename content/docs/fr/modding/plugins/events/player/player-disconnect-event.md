@@ -37,8 +37,9 @@ public class PlayerDisconnectEvent extends PlayerRefEvent<Void> {
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getPlayerRef` | `public PlayerRef getPlayerRef()` | Retourne la reference du joueur qui se deconnecte (hérité) |
-| `getDisconnectReason` | `public PacketHandler.DisconnectReason getDisconnectReason()` | Retourne la raison pour laquelle le joueur s'est deconnecte |
+| `getPlayerRef` | `@Nonnull public PlayerRef getPlayerRef()` | Retourne la reference du joueur qui se deconnecte (hérité) |
+| `getDisconnectReason` | `@Nonnull public PacketHandler.DisconnectReason getDisconnectReason()` | Retourne la raison pour laquelle le joueur s'est deconnecte |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

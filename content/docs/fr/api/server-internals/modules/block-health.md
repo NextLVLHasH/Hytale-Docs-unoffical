@@ -89,6 +89,10 @@ public class BlockHealthChunk implements Component<ChunkStore> {
 | `getBlockHealth` | `float getBlockHealth(Vector3i block)` | Obtenir la sante actuelle d'un bloc (retourne 1.0 si non endommage) |
 | `makeBlockFragile` | `void makeBlockFragile(Vector3i blockLocation, float fragileDuration)` | Marquer un bloc comme fragile pour une duree |
 | `isBlockFragile` | `boolean isBlockFragile(Vector3i block)` | Verifier si un bloc est actuellement fragile |
+| `getBlockHealthMap` | `@Nonnull Map<Vector3i, BlockHealth> getBlockHealthMap()` | Obtenir un acces direct a la map interne des blocs endommages |
+| `getBlockFragilityMap` | `@Nonnull Map<Vector3i, FragileBlock> getBlockFragilityMap()` | Obtenir un acces direct a la map interne des blocs fragiles |
+| `createBlockDamagePackets` | `void createBlockDamagePackets(@Nonnull List<Packet> list)` | Generer des paquets UpdateBlockDamage pour tous les blocs endommages (utilise lors du chargement des chunks) |
+| `clone` | `@Nonnull BlockHealthChunk clone()` | Creer une copie profonde de ce composant |
 
 ### Endommager des Blocs
 

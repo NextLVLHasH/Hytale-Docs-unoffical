@@ -26,6 +26,12 @@ public class EntityRemoveEvent extends EntityEvent<Entity, String> {
     public EntityRemoveEvent(Entity entity) {
         super(entity);
     }
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return "EntityRemoveEvent{} " + super.toString();
+    }
 }
 ```
 
@@ -37,12 +43,18 @@ The `EntityRemoveEvent` extends `EntityEvent`, which provides access to the enti
 public abstract class EntityEvent<EntityType extends Entity, KeyType> implements IEvent<KeyType> {
     private final EntityType entity;
 
-    protected EntityEvent(EntityType entity) {
+    public EntityEvent(EntityType entity) {
         this.entity = entity;
     }
 
     public EntityType getEntity() {
         return this.entity;
+    }
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return "EntityEvent{entity=" + this.entity + "}";
     }
 }
 ```
@@ -60,6 +72,7 @@ public abstract class EntityEvent<EntityType extends Entity, KeyType> implements
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `getEntity()` | `Entity` | Returns the entity being removed |
+| `toString()` | `@Nonnull String` | Returns a string representation of the event |
 
 ## Usage Example
 

@@ -40,16 +40,17 @@ public class PlayerChatEvent implements IAsyncEvent<String>, ICancellable {
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getSender` | `public PlayerRef getSender()` | Returns the player who sent the message |
+| `getSender` | `@Nonnull public PlayerRef getSender()` | Returns the player who sent the message |
 | `setSender` | `public void setSender(@Nonnull PlayerRef sender)` | Changes the sender of the message |
-| `getTargets` | `public List<PlayerRef> getTargets()` | Returns the list of message recipients |
+| `getTargets` | `@Nonnull public List<PlayerRef> getTargets()` | Returns the list of message recipients |
 | `setTargets` | `public void setTargets(@Nonnull List<PlayerRef> targets)` | Sets the list of message recipients |
-| `getContent` | `public String getContent()` | Returns the chat message content |
+| `getContent` | `@Nonnull public String getContent()` | Returns the chat message content |
 | `setContent` | `public void setContent(@Nonnull String content)` | Modifies the chat message content |
-| `getFormatter` | `public PlayerChatEvent.Formatter getFormatter()` | Returns the message formatter |
+| `getFormatter` | `@Nonnull public PlayerChatEvent.Formatter getFormatter()` | Returns the message formatter |
 | `setFormatter` | `public void setFormatter(@Nonnull PlayerChatEvent.Formatter formatter)` | Sets a custom message formatter |
 | `isCancelled` | `public boolean isCancelled()` | Returns whether the event is cancelled |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Cancels or uncancels the event |
+| `toString` | `@Nonnull public String toString()` | Returns a string representation of this event |
 
 ## Inner Classes
 

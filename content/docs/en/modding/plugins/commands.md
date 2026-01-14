@@ -464,16 +464,17 @@ public interface PermissionHolder {
 
 | Command | Usage | Description |
 |---------|-------|-------------|
-| `/give` | `/give <item> [--quantity=1] [--metadata=?]` | Gives items to the player |
-| `/gamemode` | `/gamemode <mode>` | Changes game mode (alias: `/gm`) |
+| `/give` | `/give <item> [quantity] [--metadata=?]` | Gives items to yourself (alias: `/give <player> <item> [quantity] [--metadata=?]` for others) |
+| `/give armor` | `/give armor <search> [--player=?] [--set]` | Gives armor matching the search string (use `--set` to replace existing armor) |
+| `/gamemode` | `/gamemode <mode> [player]` | Changes game mode (alias: `/gm`) |
 | `/kill` | `/kill [player]` | Kills player(s) |
 | `/kick` | `/kick <player>` | Kicks a player from the server |
 | `/stop` | `/stop [--crash]` | Stops the server (alias: `/shutdown`) |
 | `/help` | `/help [command]` | Shows command help (alias: `/?`) |
-| `/sudo` | `/sudo <player> <command...>` | Execute as another player (alias: `/su`) |
-| `/whereami` | `/whereami` | Shows player location info |
+| `/sudo` | `/sudo <player> <command...>` | Execute as another player (alias: `/su`). Use `*` as player to target all players |
+| `/whereami` | `/whereami [player]` | Shows player location info |
 | `/entity` | `/entity <subcommand>` | Entity management (alias: `/entities`) |
-| `/worldmap` | `/worldmap <subcommand>` | World map operations |
+| `/worldmap` | `/worldmap <subcommand>` | World map operations (alias: `/map`) |
 
 ## Input Tokenization
 

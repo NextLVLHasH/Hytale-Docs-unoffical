@@ -41,6 +41,7 @@ public class PlayerSetupDisconnectEvent implements IEvent<Void> {
 | `getUuid` | `public UUID getUuid()` | Retourne l'UUID du joueur |
 | `getAuth` | `public PlayerAuthentication getAuth()` | Retourne les informations d'authentification |
 | `getDisconnectReason` | `public PacketHandler.DisconnectReason getDisconnectReason()` | Retourne la raison de la deconnexion du joueur |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

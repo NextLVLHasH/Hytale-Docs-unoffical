@@ -43,6 +43,12 @@ public class LivingEntityInventoryChangeEvent extends EntityEvent<LivingEntity, 
     public Transaction getTransaction() {
         return this.transaction;
     }
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return "LivingEntityInventoryChangeEvent{itemContainer=" + this.itemContainer + ", transaction=" + this.transaction + "} " + super.toString();
+    }
 }
 ```
 
@@ -68,6 +74,7 @@ public class LivingEntityInventoryChangeEvent extends EntityEvent<LivingEntity, 
 |---------|----------------|-------------|
 | `getItemContainer()` | `ItemContainer` | Retourne le conteneur d'objets qui a ete modifie |
 | `getTransaction()` | `Transaction` | Retourne les details de la transaction pour ce changement |
+| `toString()` | `@Nonnull String` | Retourne une representation textuelle de l'événement incluant le conteneur et la transaction |
 
 ## Exemple d'utilisation
 

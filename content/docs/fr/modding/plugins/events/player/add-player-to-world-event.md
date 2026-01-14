@@ -22,6 +22,11 @@ Déclenché lorsqu'un joueur est en cours d'ajout a un monde. Cet événement pe
 
 ```java
 public class AddPlayerToWorldEvent implements IEvent<String> {
+   @Nonnull
+   private final Holder<EntityStore> holder;
+   @Nonnull
+   private final World world;
+   private boolean broadcastJoinMessage = true;
 ```
 
 ## Champs
@@ -36,10 +41,11 @@ public class AddPlayerToWorldEvent implements IEvent<String> {
 
 | Méthode | Signature | Description |
 |---------|-----------|-------------|
-| `getHolder` | `public Holder<EntityStore> getHolder()` | Retourne le conteneur d'entite du joueur |
-| `getWorld` | `public World getWorld()` | Retourne le monde rejoint |
+| `getHolder` | `@Nonnull public Holder<EntityStore> getHolder()` | Retourne le conteneur d'entite du joueur |
+| `getWorld` | `@Nonnull public World getWorld()` | Retourne le monde rejoint |
 | `shouldBroadcastJoinMessage` | `public boolean shouldBroadcastJoinMessage()` | Retourne si un message de connexion sera diffuse |
 | `setBroadcastJoinMessage` | `public void setBroadcastJoinMessage(boolean broadcastJoinMessage)` | Definit s'il faut diffuser un message de connexion |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 

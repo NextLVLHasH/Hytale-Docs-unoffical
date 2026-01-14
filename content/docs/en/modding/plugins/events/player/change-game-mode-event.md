@@ -40,10 +40,10 @@ public class ChangeGameModeEvent extends CancellableEcsEvent {
 
 | Method | Return Type | Line | Description |
 |--------|-------------|------|-------------|
-| `getGameMode()` | `GameMode` | - | Gets the target game mode |
-| `setGameMode(GameMode)` | `void` | 20 | Changes the target game mode |
-| `isCancelled()` | `boolean` | - | Returns whether the event has been cancelled |
-| `setCancelled(boolean)` | `void` | - | Sets the cancelled state of the event |
+| `getGameMode()` | `@Nonnull GameMode` | 16 | Gets the target game mode |
+| `setGameMode(@Nonnull GameMode)` | `void` | 20 | Changes the target game mode |
+| `isCancelled()` | `boolean` | - | Returns whether the event has been cancelled (inherited) |
+| `setCancelled(boolean)` | `void` | - | Sets the cancelled state of the event (inherited) |
 
 ## Usage Example
 

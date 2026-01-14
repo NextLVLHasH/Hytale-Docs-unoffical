@@ -28,19 +28,19 @@ public abstract class UseBlockEvent extends EcsEvent {
 
 | Field | Type | Accessor | Description |
 |-------|------|----------|-------------|
-| `interactionType` | `InteractionType` | `getInteractionType()` | The type of interaction being performed |
-| `context` | `InteractionContext` | `getContext()` | Additional context about the interaction |
-| `targetBlock` | `Vector3i` | `getTargetBlock()` | The position of the block being interacted with |
-| `blockType` | `BlockType` | `getBlockType()` | The type of block being interacted with |
+| `interactionType` | `@Nonnull InteractionType` | `getInteractionType()` | The type of interaction being performed |
+| `context` | `@Nonnull InteractionContext` | `getContext()` | Additional context about the interaction |
+| `targetBlock` | `@Nonnull Vector3i` | `getTargetBlock()` | The position of the block being interacted with |
+| `blockType` | `@Nonnull BlockType` | `getBlockType()` | The type of block being interacted with |
 
 ## Methods
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `getInteractionType` | `public InteractionType getInteractionType()` | Returns the type of interaction (e.g., USE, ATTACK) |
-| `getContext` | `public InteractionContext getContext()` | Returns the interaction context with additional details |
-| `getTargetBlock` | `public Vector3i getTargetBlock()` | Returns the world position of the target block |
-| `getBlockType` | `public BlockType getBlockType()` | Returns the type of block being used |
+| `getInteractionType` | `@Nonnull public InteractionType getInteractionType()` | Returns the type of interaction (e.g., USE, ATTACK) |
+| `getContext` | `@Nonnull public InteractionContext getContext()` | Returns the interaction context with additional details |
+| `getTargetBlock` | `@Nonnull public Vector3i getTargetBlock()` | Returns the world position of the target block |
+| `getBlockType` | `@Nonnull public BlockType getBlockType()` | Returns the type of block being used |
 
 ## Inner Classes
 
@@ -55,7 +55,7 @@ The `Pre` event fires **before** the block interaction is processed. This varian
 | **Implements** | `ICancellableEcsEvent` |
 
 ```java
-public static class Pre extends UseBlockEvent implements ICancellableEcsEvent {
+public static final class Pre extends UseBlockEvent implements ICancellableEcsEvent {
     // Inherits all fields from UseBlockEvent
     // Adds cancellation capability
 
@@ -74,7 +74,7 @@ The `Post` event fires **after** the block interaction has been processed. This 
 | **Cancellable** | No |
 
 ```java
-public static class Post extends UseBlockEvent {
+public static final class Post extends UseBlockEvent {
     // Inherits all fields from UseBlockEvent
     // Fires after interaction completes
 }

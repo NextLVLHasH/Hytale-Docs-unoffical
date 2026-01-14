@@ -58,6 +58,7 @@ public class PlayerInteractEvent extends PlayerEvent<String> implements ICancell
 | `getTargetEntity` | `public Entity getTargetEntity()` | Retourne l'entite ciblee |
 | `isCancelled` | `public boolean isCancelled()` | Retourne si l'événement est annule |
 | `setCancelled` | `public void setCancelled(boolean cancelled)` | Annule ou reactive l'événement |
+| `toString` | `@Nonnull public String toString()` | Retourne une representation textuelle de cet evenement |
 
 ## Exemple d'utilisation
 
