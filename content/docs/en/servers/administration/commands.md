@@ -1911,3 +1911,693 @@ Manage world map view radius settings.
 /worldmap viewradius set 1024 --bypass
 /worldmap viewradius remove
 ```
+
+---
+
+## NPC Commands
+
+Commands for spawning and managing NPCs (Non-Player Characters) and AI entities.
+
+### npc spawn
+
+Spawns an NPC entity with a specified role.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc spawn <role> [count] [radius] [flags] [options...]` |
+
+**Parameters:**
+- `role` - The NPC role template to spawn
+- `count` (optional) - Number of NPCs to spawn (default: 1)
+- `radius` (optional) - Spawn radius around player (default: 8.0)
+- `flags` (optional) - Comma-separated debug flags
+- `speed` (optional) - Initial velocity speed
+- `position` (optional) - Exact spawn position (x,y,z format)
+- `posOffset` (optional) - Position offset (x,y,z format)
+- `headRotation` (optional) - Head rotation (yaw,pitch,roll format)
+- `bodyRotation` (optional) - Body rotation (yaw,pitch,roll format)
+- `flock` (optional) - Flock size or flock asset name
+- `scale` (optional) - Model scale factor
+
+**Flags:**
+- `--nonrandom` - Use deterministic positioning
+- `--randomRotation` - Apply random rotation to spawned NPCs
+- `--facingRotation` - Face the player
+- `--test` - Test spawn location validity
+- `--spawnOnGround` - Force ground-level spawning
+- `--frozen` - Spawn NPC in frozen state
+- `--randomModel` - Apply random skin/model
+- `--bypassScaleLimits` - Allow exceeding scale limits
+
+**Examples:**
+```
+/npc spawn Trork
+/npc spawn Kweebec 5 10
+/npc spawn Trork --frozen
+/npc spawn Kweebec --position=100,64,200
+/npc spawn Trork --scale=1.5 --bypassScaleLimits
+```
+
+---
+
+### npc freeze
+
+Freezes NPC entities, stopping their AI behavior.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc freeze [--all] [--toggle] [entity]` |
+
+**Parameters:**
+- `--all` (flag) - Freeze all NPCs and items in the world
+- `--toggle` (flag) - Toggle freeze state instead of always freezing
+- `entity` (optional) - Target entity ID (uses looked-at entity if not specified)
+
+**Examples:**
+```
+/npc freeze
+/npc freeze --all
+/npc freeze --toggle
+/npc freeze 12345
+```
+
+---
+
+### npc thaw
+
+Unfreezes NPC entities, resuming their AI behavior.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc thaw [--all] [entity]` |
+| **Aliases** | `unfreeze` |
+
+**Parameters:**
+- `--all` (flag) - Unfreeze all NPCs in the world
+- `entity` (optional) - Target entity ID (uses looked-at entity if not specified)
+
+**Examples:**
+```
+/npc thaw
+/npc thaw --all
+/npc thaw 12345
+```
+
+---
+
+### npc clean
+
+Removes all NPC entities from the current world.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc clean` |
+
+**Warning:** This is a destructive command that removes all NPCs.
+
+**Examples:**
+```
+/npc clean
+```
+
+---
+
+### npc dump
+
+Dumps NPC role component hierarchy to the server log.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc dump [--json] [entity]` |
+
+**Parameters:**
+- `--json` (flag) - Output in JSON format
+- `entity` (optional) - Target entity ID (uses looked-at entity if not specified)
+
+**Examples:**
+```
+/npc dump
+/npc dump --json
+```
+
+---
+
+### npc give
+
+Gives an item to an NPC entity.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc give <item> [entity]` |
+
+**Parameters:**
+- `item` - Item asset ID to give (sets as weapon or armor)
+- `entity` (optional) - Target entity ID
+
+**Subcommands:**
+- `/npc give nothing [entity]` - Remove held item from NPC
+
+**Examples:**
+```
+/npc give Sword_Iron
+/npc give Armor_Trork_Chainmail
+/npc give nothing
+```
+
+---
+
+### npc role
+
+Gets or sets the role of an NPC entity.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc role [role] [entity]` |
+
+**Parameters:**
+- `role` (optional) - New role to assign. If not specified, displays current role.
+- `entity` (optional) - Target entity ID
+
+**Examples:**
+```
+/npc role
+/npc role Trork_Warrior
+/npc role Kweebec 12345
+```
+
+---
+
+### npc path
+
+Sets a movement path for an NPC.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc path <instructions> [entity]` |
+
+**Parameters:**
+- `instructions` - Comma-separated rotation,distance pairs (e.g., "90,5,0,10" = turn 90deg walk 5, go straight 10)
+
+**Subcommands:**
+- `/npc path polygon <sides> [length] [entity]` - Create polygon path
+
+**Examples:**
+```
+/npc path 90,5,0,10,-90,3
+/npc path polygon 4
+/npc path polygon 6 10
+```
+
+---
+
+### npc attack
+
+Sets or clears attack sequence overrides for an NPC.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc attack [attack...] [entity]` |
+
+**Subcommands:**
+- `/npc attack clear [entity]` - Clear attack overrides
+
+**Parameters:**
+- `attack` (optional) - List of interaction asset IDs for attack sequence
+
+**Examples:**
+```
+/npc attack Slash_Light Slash_Heavy
+/npc attack clear
+```
+
+---
+
+### npc debug
+
+Manages NPC debug visualization flags.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc debug <subcommand>` |
+
+**Subcommands:**
+
+| Subcommand | Syntax | Description |
+|------------|--------|-------------|
+| `show` | `/npc debug show [entity]` | Show current debug flags |
+| `set` | `/npc debug set <flags> [entity]` | Set debug flags |
+| `toggle` | `/npc debug toggle <flags> [entity]` | Toggle debug flags |
+| `defaults` | `/npc debug defaults [entity]` | Reset to default flags |
+| `clear` | `/npc debug clear [entity]` | Clear all debug flags |
+| `presets` | `/npc debug presets [preset]` | List presets or show preset info |
+
+**Examples:**
+```
+/npc debug show
+/npc debug set pathfinding,combat
+/npc debug toggle sensors
+/npc debug presets
+/npc debug defaults
+```
+
+---
+
+### npc step
+
+Advances NPC simulation by one tick while frozen.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc step [--all] [dt] [entity]` |
+
+**Parameters:**
+- `--all` (flag) - Step all NPCs
+- `dt` (optional) - Delta time for step (default: 1/TPS)
+- `entity` (optional) - Target entity ID
+
+**Examples:**
+```
+/npc step
+/npc step --all
+/npc step 0.05
+```
+
+---
+
+### npc blackboard
+
+Manages NPC blackboard data (shared AI knowledge).
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc blackboard <subcommand>` |
+
+**Subcommands:**
+- `chunks` - List tracked chunks
+- `chunk <x> <z>` - Show chunk data
+- `drop` - Drop blackboard data
+- `views` - List registered views
+- `view <type>` - Show view data
+- `blockevents` - Show block event subscriptions
+- `entityevents` - Show entity event subscriptions
+- `resourceviews` - List resource views
+- `resourceview <type>` - Show resource view data
+- `reserve <position>` - Reserve interaction at position
+- `reservation <position>` - Check reservation status
+
+**Examples:**
+```
+/npc blackboard chunks
+/npc blackboard views
+/npc blackboard blockevents
+```
+
+---
+
+### npc flock
+
+Manages NPC flock behavior (group movement).
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/npc flock <subcommand>` |
+
+**Subcommands:**
+
+| Subcommand | Syntax | Description |
+|------------|--------|-------------|
+| `grab` | `/npc flock grab` | Add NPCs in view to your flock |
+| `join` | `/npc flock join` | Join the flock of an NPC in view |
+| `leave` | `/npc flock leave` | Remove NPCs in view from flocks |
+| `playerleave` | `/npc flock playerleave` | Leave your current flock |
+
+**Examples:**
+```
+/npc flock grab
+/npc flock join
+/npc flock leave
+/npc flock playerleave
+```
+
+---
+
+## Network Commands
+
+Commands for network debugging and latency simulation.
+
+### network latencysimulation
+
+Simulates network latency for testing purposes.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/network latencysimulation <subcommand>` |
+| **Aliases** | `net`, `latsim` |
+
+**Subcommands:**
+
+| Subcommand | Syntax | Description |
+|------------|--------|-------------|
+| `set` | `/network latencysimulation set <delay> [player]` | Set latency in milliseconds |
+| `reset` | `/network latencysimulation reset [player]` | Clear simulated latency |
+
+**Examples:**
+```
+/network latencysimulation set 100
+/net latsim set 200 PlayerName
+/network latencysimulation reset
+```
+
+---
+
+### network serverknockback
+
+Toggles server-side knockback prediction.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/network serverknockback` |
+
+**Examples:**
+```
+/network serverknockback
+```
+
+---
+
+### network debugknockback
+
+Toggles knockback position debugging.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/network debugknockback` |
+
+**Examples:**
+```
+/network debugknockback
+```
+
+---
+
+## Prefab Commands
+
+Commands for managing and converting prefab structures.
+
+### convertprefabs
+
+Converts and updates prefab files.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/convertprefabs [--blocks] [--filler] [--relative] [--entities] [--destructive] [path] [store]` |
+
+**Parameters:**
+- `--blocks` (flag) - Reserialize block states
+- `--filler` (flag) - Fix filler block data
+- `--relative` (flag) - Convert to relative coordinates
+- `--entities` (flag) - Reserialize entity data
+- `--destructive` (flag) - Allow destructive modifications
+- `path` (optional) - Specific path to convert
+- `store` (optional) - Prefab store: "asset", "server", "worldgen", or "all" (default: "asset")
+
+**Examples:**
+```
+/convertprefabs
+/convertprefabs --blocks --entities
+/convertprefabs --filler --destructive
+/convertprefabs store=worldgen
+```
+
+---
+
+## Asset Commands
+
+Commands for managing and debugging game assets.
+
+### assets
+
+Parent command for asset management subcommands.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/assets <subcommand>` |
+
+**Subcommands:**
+- `tags` - Asset tag management
+- `duplicates` - Find duplicate assets
+- `longest` - Find longest asset names per type
+
+**Examples:**
+```
+/assets tags
+/assets duplicates
+/assets longest
+```
+
+---
+
+## Server Debug Commands
+
+Extended server debugging and monitoring commands.
+
+### server gc
+
+Forces a garbage collection cycle.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/server gc` |
+
+**Information displayed:**
+- Memory freed (or increased) by GC
+
+**Examples:**
+```
+/server gc
+```
+
+---
+
+### server dump
+
+Creates a server state dump for debugging.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/server dump [--json]` |
+
+**Parameters:**
+- `--json` (flag) - Export as JSON format
+
+**Examples:**
+```
+/server dump
+/server dump --json
+```
+
+---
+
+## Sleep Commands
+
+Commands for testing and configuring server tick timing.
+
+### sleep offset
+
+Gets or sets the sleep timing offset.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/sleep offset [offset] [--percent]` |
+
+**Parameters:**
+- `offset` (optional) - New offset value. If not specified, displays current value.
+- `--percent` (flag) - Display/set as percentage
+
+**Examples:**
+```
+/sleep offset
+/sleep offset 1000
+/sleep offset --percent
+```
+
+---
+
+### sleep test
+
+Benchmarks system sleep accuracy.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/sleep test [sleep] [count]` |
+
+**Parameters:**
+- `sleep` (optional) - Sleep duration in milliseconds (default: 10)
+- `count` (optional) - Number of iterations (default: 1000)
+
+**Information displayed:**
+- Delta time (min, max, average)
+- Offset from expected (min, max, average)
+
+**Examples:**
+```
+/sleep test
+/sleep test 20 500
+```
+
+---
+
+## Packet Statistics Commands
+
+Commands for analyzing network packet data.
+
+### packetstats
+
+Displays detailed statistics for a specific packet type.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/packetstats <packet> [player]` |
+
+**Parameters:**
+- `packet` - Packet type name to analyze
+- `player` (optional) - Target player
+
+**Information displayed:**
+- Packet ID
+- Sent statistics (count, size, compressed/uncompressed, avg, min, max)
+- Received statistics
+- Recent traffic data
+
+**Examples:**
+```
+/packetstats ChunkData
+/packetstats EntityPosition PlayerName
+```
+
+---
+
+## Pack Commands
+
+Commands for managing loaded asset packs.
+
+### packs list
+
+Lists all loaded asset packs.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/packs list` |
+| **Aliases** | `ls` |
+
+**Information displayed:**
+- Pack name
+- Pack root directory
+
+**Examples:**
+```
+/packs list
+/packs ls
+```
+
+---
+
+## Stress Test Commands
+
+Commands for server performance stress testing.
+
+### stresstest start
+
+Starts a stress test by spawning bot clients.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/stresstest start [options...]` |
+
+**Parameters:**
+- `name` (optional) - Test name for output files
+- `initcount` (optional) - Initial bot count (default: 0)
+- `interval` (optional) - Seconds between adding bots (default: 30)
+- `dumptype` (optional) - When to dump metrics: NEW_BOT, INTERVAL, FINISH, NEVER
+- `dumpinterval` (optional) - Seconds between dumps (default: 300)
+- `threshold` (optional) - Tick time threshold in ms
+- `percentile` (optional) - Percentile for threshold (default: 0.95)
+- `viewradius` (optional) - Bot view radius (default: 192)
+- `radius` (optional) - Bot movement radius (default: 384)
+- `yheight` (optional) - Bot Y coordinate (default: 125)
+- `flySpeed` (optional) - Bot movement speed (default: 8.0)
+- `--shutdown` (flag) - Shutdown server when threshold exceeded
+
+**Examples:**
+```
+/stresstest start
+/stresstest start --initcount=10 --interval=60
+/stresstest start --name=test1 --threshold=50
+```
+
+---
+
+### stresstest stop
+
+Stops the running stress test.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/stresstest stop` |
+
+**Examples:**
+```
+/stresstest stop
+```
+
+---
+
+## Container Commands
+
+Commands for managing block containers and inventories.
+
+### stash
+
+Gets or sets the droplist for a container block.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/stash [set]` |
+
+**Parameters:**
+- `set` (optional) - Droplist name to assign to the targeted container
+
+**Requirements:**
+- Must be looking at a container block within 10 blocks
+
+**Examples:**
+```
+/stash
+/stash MyDroplist
+```
+
+---
+
+## Event Commands
+
+Commands for displaying event notifications.
+
+### eventtitle
+
+Displays an event title to all players.
+
+| Property | Value |
+|----------|-------|
+| **Syntax** | `/eventtitle [--major] [--secondary=<text>] <title>` |
+
+**Parameters:**
+- `title` - Primary title text to display
+- `--major` (flag) - Display as major (larger) event
+- `--secondary` (optional) - Secondary subtitle text (default: "Event")
+
+**Examples:**
+```
+/eventtitle Boss Defeated!
+/eventtitle --major Victory!
+/eventtitle --secondary="World Event" Dragon Awakens
+```

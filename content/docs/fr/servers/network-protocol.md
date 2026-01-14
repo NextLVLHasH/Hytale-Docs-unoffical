@@ -1018,3 +1018,471 @@ Les paquets de fenetre gerent les conteneurs d'interface comme les coffres, les 
 | Paquets de Monde | `com/hypixel/hytale/protocol/packets/world/*.java` |
 | Paquets d'Inventaire | `com/hypixel/hytale/protocol/packets/inventory/*.java` |
 | Paquets de Fenetre | `com/hypixel/hytale/protocol/packets/window/*.java` |
+| Paquets Camera | `com/hypixel/hytale/protocol/packets/camera/*.java` |
+| Paquets Machinima | `com/hypixel/hytale/protocol/packets/machinima/*.java` |
+| Paquets Interface | `com/hypixel/hytale/protocol/packets/interface_/*.java` |
+
+---
+
+## Structures de Paquets Supplementaires
+
+Cette section documente les categories de paquets supplementaires non couvertes dans la section principale ci-dessus.
+
+### Paquets de Chat/Communication
+
+Les paquets de chat gerent la communication textuelle entre les joueurs et le serveur.
+
+#### ChatMessage (ID 211)
+
+**Direction :** Client -> Serveur
+**Compresse :** Non
+**Description :** Envoie un message de chat du client au serveur. Utilise pour les entrees de chat des joueurs.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Bit 0 = message present |
+| 1 | message | VarString | Variable | Contenu du message de chat (max 4 096 000 caracteres) |
+
+**Taille fixe :** 1 octet (minimum)
+**Taille maximale :** 16 384 006 octets
+
+#### ServerMessage (ID 210)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Envoie un message formate du serveur au client. Utilise pour les messages systeme et le chat formate.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Bit 0 = message present |
+| 1 | type | octet | 1 | Valeur enum ChatType |
+| 2 | message | FormattedMessage | Variable | Contenu du message formate (optionnel) |
+
+**Valeurs ChatType :**
+- `0` - Chat : Message de chat standard
+
+**Taille fixe :** 2 octets (minimum)
+**Taille maximale :** 1 677 721 600 octets
+
+#### Notification (ID 212)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Affiche une notification popup au joueur. Prend en charge les messages primaires/secondaires, les icones et l'affichage d'objets.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence pour les champs optionnels |
+| 1 | style | octet | 1 | Valeur enum NotificationStyle |
+| 2 | messageOffset | int32 LE | 4 | Offset vers le message principal |
+| 6 | secondaryMessageOffset | int32 LE | 4 | Offset vers le message secondaire |
+| 10 | iconOffset | int32 LE | 4 | Offset vers la chaine d'icone |
+| 14 | itemOffset | int32 LE | 4 | Offset vers les donnees de l'objet |
+| 18+ | (Donnees variables) | Variable | Variable | Message, icone et donnees d'objet |
+
+**Valeurs NotificationStyle :**
+- `0` - Default : Notification standard
+- `1` - Danger : Style rouge/alerte
+- `2` - Warning : Style jaune/attention
+- `3` - Success : Style vert/succes
+
+**Taille fixe :** 18 octets (minimum)
+**Taille maximale :** 1 677 721 600 octets
+
+#### KillFeedMessage (ID 213)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Affiche une entree dans le fil des eliminations montrant qui a tue qui, avec une icone optionnelle (arme/cause).
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence |
+| 1 | killerOffset | int32 LE | 4 | Offset vers le message du tueur |
+| 5 | decedentOffset | int32 LE | 4 | Offset vers le message du decede |
+| 9 | iconOffset | int32 LE | 4 | Offset vers la chaine d'icone |
+| 13+ | (Donnees variables) | Variable | Variable | Donnees du tueur, du decede et de l'icone |
+
+**Taille fixe :** 13 octets (minimum)
+**Taille maximale :** 1 677 721 600 octets
+
+#### ShowEventTitle (ID 214)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Affiche un titre/sous-titre en superposition sur l'ecran du joueur avec des animations de fondu configurables.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence |
+| 1 | fadeInDuration | float LE | 4 | Duree de l'animation d'apparition (secondes) |
+| 5 | fadeOutDuration | float LE | 4 | Duree de l'animation de disparition (secondes) |
+| 9 | duration | float LE | 4 | Duree d'affichage (secondes) |
+| 13 | isMajor | octet | 1 | Booleen : style de titre large |
+| 14 | iconOffset | int32 LE | 4 | Offset vers la chaine d'icone |
+| 18 | primaryTitleOffset | int32 LE | 4 | Offset vers le titre principal |
+| 22 | secondaryTitleOffset | int32 LE | 4 | Offset vers le titre secondaire |
+| 26+ | (Donnees variables) | Variable | Variable | Contenu du titre |
+
+**Taille fixe :** 26 octets (minimum)
+**Taille maximale :** 1 677 721 600 octets
+
+#### HideEventTitle (ID 215)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Masque le titre d'evenement actuellement affiche avec une animation de fondu.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | fadeOutDuration | float LE | 4 | Duree de disparition en secondes |
+
+**Taille fixe :** 4 octets
+
+---
+
+### Paquets Audio
+
+Les paquets audio gerent la lecture audio sur le client.
+
+#### PlaySoundEvent2D (ID 154)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Joue un son non positionnel (2D), typiquement pour les sons d'interface ou la musique qui doit etre jouee a un volume constant.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | soundEventIndex | int32 LE | 4 | ID de l'evenement sonore du registre d'assets |
+| 4 | category | octet | 1 | Valeur enum SoundCategory |
+| 5 | volumeModifier | float LE | 4 | Multiplicateur de volume (1.0 = normal) |
+| 9 | pitchModifier | float LE | 4 | Multiplicateur de hauteur (1.0 = normal) |
+
+**Valeurs SoundCategory :**
+- `0` - Music : Musique de fond
+- `1` - Ambient : Sons environnementaux
+- `2` - SFX : Effets sonores
+- `3` - UI : Sons d'interface
+
+**Taille fixe :** 13 octets
+
+#### PlaySoundEvent3D (ID 155)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Joue un son positionnel (3D) a un emplacement specifique du monde avec attenuation selon la distance.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Bit 0 = position presente |
+| 1 | soundEventIndex | int32 LE | 4 | ID de l'evenement sonore |
+| 5 | category | octet | 1 | Valeur enum SoundCategory |
+| 6 | position | Position | 24 | Position dans le monde (x, y, z en doubles) |
+| 30 | volumeModifier | float LE | 4 | Multiplicateur de volume |
+| 34 | pitchModifier | float LE | 4 | Multiplicateur de hauteur |
+
+**Taille fixe :** 38 octets
+
+#### PlaySoundEventEntity (ID 156)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Joue un son attache a une entite, suivant la position de l'entite.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | soundEventIndex | int32 LE | 4 | ID de l'evenement sonore |
+| 4 | networkId | int32 LE | 4 | ID reseau de l'entite pour attacher le son |
+| 8 | volumeModifier | float LE | 4 | Multiplicateur de volume |
+| 12 | pitchModifier | float LE | 4 | Multiplicateur de hauteur |
+
+**Taille fixe :** 16 octets
+
+---
+
+### Paquets Meteo/Environnement
+
+Les paquets meteo controlent les conditions environnementales et l'heure du jour.
+
+#### UpdateWeather (ID 149)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Change l'etat meteo actuel avec une animation de transition.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | weatherIndex | int32 LE | 4 | ID du type de meteo du registre d'assets |
+| 4 | transitionSeconds | float LE | 4 | Duree de la transition meteo |
+
+**Taille fixe :** 8 octets
+
+#### UpdateEditorWeatherOverride (ID 150)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Force un etat meteo specifique en mode editeur, contournant les transitions meteo normales.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | weatherIndex | int32 LE | 4 | ID du type de meteo a forcer |
+
+**Taille fixe :** 4 octets
+
+#### UpdateEnvironmentMusic (ID 151)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Change la musique ambiante en fonction de l'environnement/biome.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | environmentIndex | int32 LE | 4 | ID d'environnement pour la selection musicale |
+
+**Taille fixe :** 4 octets
+
+#### UpdateTime (ID 146)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Synchronise l'heure du jeu entre le serveur et le client.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Bit 0 = gameTime present |
+| 1 | gameTime | InstantData | 12 | Donnees de l'heure actuelle du jeu |
+
+**Taille fixe :** 13 octets
+
+---
+
+### Paquets Camera
+
+Les paquets camera controlent la vue de la camera du joueur et les effets.
+
+#### SetServerCamera (ID 280)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Definit le mode de vue de la camera du client et les parametres optionnels de camera personnalisee.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Bit 0 = cameraSettings present |
+| 1 | clientCameraView | octet | 1 | Valeur enum ClientCameraView |
+| 2 | isLocked | octet | 1 | Booleen : empecher le controle de la camera par le joueur |
+| 3 | cameraSettings | ServerCameraSettings | 154 | Configuration de camera personnalisee (optionnel) |
+
+**Valeurs ClientCameraView :**
+- `0` - FirstPerson : Vue a la premiere personne
+- `1` - ThirdPerson : Vue a la troisieme personne
+- `2` - Custom : Vue personnalisee controlee par le serveur
+
+**Taille fixe :** 157 octets
+
+#### CameraShakeEffect (ID 281)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Applique un effet de tremblement de camera pour le retour d'impact, les explosions, etc.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | cameraShakeId | int32 LE | 4 | ID du preset de tremblement de camera |
+| 4 | intensity | float LE | 4 | Multiplicateur d'intensite du tremblement |
+| 8 | mode | octet | 1 | Valeur enum AccumulationMode |
+
+**Valeurs AccumulationMode :**
+- `0` - Set : Remplacer le tremblement actuel
+- `1` - Sum : Ajouter au tremblement actuel
+- `2` - Average : Melanger avec le tremblement actuel
+
+**Taille fixe :** 9 octets
+
+#### RequestFlyCameraMode (ID 282)
+
+**Direction :** Client -> Serveur
+**Compresse :** Non
+**Description :** Le client demande a entrer ou sortir du mode camera libre (camera spectateur/cinematique).
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | entering | octet | 1 | Booleen : entrer (true) ou sortir (false) du mode libre |
+
+**Taille fixe :** 1 octet
+
+#### SetFlyCameraMode (ID 283)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Reponse du serveur activant ou desactivant le mode camera libre.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | entering | octet | 1 | Booleen : etat d'entree en mode libre |
+
+**Taille fixe :** 1 octet
+
+---
+
+### Paquets Machinima
+
+Les paquets machinima prennent en charge les fonctionnalites d'enregistrement et de lecture cinematique.
+
+#### RequestMachinimaActorModel (ID 260)
+
+**Direction :** Client -> Serveur
+**Compresse :** Non
+**Description :** Le client demande les donnees du modele d'acteur pour une scene machinima.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence |
+| 1 | modelIdOffset | int32 LE | 4 | Offset vers la chaine d'ID du modele |
+| 5 | sceneNameOffset | int32 LE | 4 | Offset vers la chaine du nom de scene |
+| 9 | actorNameOffset | int32 LE | 4 | Offset vers la chaine du nom d'acteur |
+| 13+ | (Donnees variables) | Variable | Variable | Donnees de chaines |
+
+**Taille fixe :** 13 octets (minimum)
+**Taille maximale :** 49 152 028 octets
+
+#### SetMachinimaActorModel (ID 261)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Le serveur envoie les donnees du modele d'acteur pour le rendu machinima.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence |
+| 1 | modelOffset | int32 LE | 4 | Offset vers les donnees du modele |
+| 5 | sceneNameOffset | int32 LE | 4 | Offset vers le nom de scene |
+| 9 | actorNameOffset | int32 LE | 4 | Offset vers le nom d'acteur |
+| 13+ | (Donnees variables) | Variable | Variable | Donnees du modele et des chaines |
+
+**Taille fixe :** 13 octets (minimum)
+**Taille maximale :** 1 677 721 600 octets
+
+#### UpdateMachinimaScene (ID 262)
+
+**Direction :** Bidirectionnel
+**Compresse :** Oui (Zstd)
+**Description :** Met a jour l'etat de la scene machinima incluant le controle de lecture et les donnees de scene.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence |
+| 1 | frame | float LE | 4 | Image d'animation actuelle |
+| 5 | updateType | octet | 1 | Valeur enum SceneUpdateType |
+| 6 | playerOffset | int32 LE | 4 | Offset vers le nom du joueur |
+| 10 | sceneNameOffset | int32 LE | 4 | Offset vers le nom de scene |
+| 14 | sceneOffset | int32 LE | 4 | Offset vers les donnees de scene |
+| 18+ | (Donnees variables) | Variable | Variable | Contenu de la scene |
+
+**Valeurs SceneUpdateType :**
+- `0` - Update : Mise a jour generale de la scene
+- `1` - Play : Demarrer la lecture
+- `2` - Stop : Arreter la lecture
+- `3` - Frame : Aller a une image specifique
+- `4` - Save : Sauvegarder les donnees de la scene
+
+**Taille fixe :** 18 octets (minimum)
+**Taille maximale :** 36 864 033 octets
+
+---
+
+### Paquets Effets/Particules
+
+Les paquets d'effets gerent les effets visuels et le post-traitement.
+
+#### SpawnParticleSystem (ID 152)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Fait apparaitre un systeme de particules a une position du monde avec couleur et echelle optionnelles.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence pour les champs optionnels |
+| 1 | position | Position | 24 | Position dans le monde (optionnel) |
+| 25 | rotation | Direction | 12 | Angles de rotation (optionnel) |
+| 37 | scale | float LE | 4 | Multiplicateur d'echelle |
+| 41 | color | Color | 3 | Teinte de couleur RGB (optionnel) |
+| 44 | particleSystemId | VarString | Variable | Chaine d'ID du systeme de particules |
+
+**Taille fixe :** 44 octets (minimum)
+**Taille maximale :** 16 384 049 octets
+
+#### SpawnBlockParticleSystem (ID 153)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Fait apparaitre des effets de particules bases sur les blocs (casse, marche, etc.).
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Bit 0 = position presente |
+| 1 | blockId | int32 LE | 4 | ID du type de bloc pour la texture |
+| 5 | particleType | octet | 1 | Enum BlockParticleEvent (Walk, Break, etc.) |
+| 6 | position | Position | 24 | Position dans le monde (optionnel) |
+
+**Taille fixe :** 30 octets
+
+#### UpdatePostFxSettings (ID 361)
+
+**Direction :** Serveur -> Client
+**Compresse :** Non
+**Description :** Met a jour les parametres des effets visuels de post-traitement.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | globalIntensity | float LE | 4 | Intensite globale de l'effet |
+| 4 | power | float LE | 4 | Puissance/force de l'effet |
+| 8 | sunshaftScale | float LE | 4 | Echelle des rayons de soleil |
+| 12 | sunIntensity | float LE | 4 | Luminosite du soleil |
+| 16 | sunshaftIntensity | float LE | 4 | Intensite de l'effet des rayons de soleil |
+
+**Taille fixe :** 20 octets
+
+---
+
+### Paquets de Fenetre (Etendus)
+
+#### UpdateWindow (ID 201)
+
+**Direction :** Serveur -> Client
+**Compresse :** Oui (Zstd)
+**Description :** Met a jour le contenu d'une fenetre ouverte sans la fermer et la rouvrir.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | nullBits | octet | 1 | Indicateurs de presence |
+| 1 | id | int32 LE | 4 | ID de la fenetre a mettre a jour |
+| 5 | windowDataOffset | int32 LE | 4 | Offset vers les donnees JSON de la fenetre |
+| 9 | inventoryOffset | int32 LE | 4 | Offset vers la section d'inventaire |
+| 13 | extraResourcesOffset | int32 LE | 4 | Offset vers les ressources supplementaires |
+| 17+ | (Donnees variables) | Variable | Variable | Contenu de la fenetre |
+
+**Taille fixe :** 17 octets (minimum)
+**Taille maximale :** 1 677 721 600 octets
+
+#### ClientOpenWindow (ID 204)
+
+**Direction :** Client -> Serveur
+**Compresse :** Non
+**Description :** Le client demande a ouvrir une fenetre d'un type specifique.
+
+| Offset | Champ | Type | Taille | Description |
+|--------|-------|------|--------|-------------|
+| 0 | type | octet | 1 | Valeur enum WindowType |
+
+**Valeurs WindowType :**
+- `0` - Container : Conteneur de stockage generique
+- `1` - PocketCrafting : Grille de craft d'inventaire
+- `2` - BasicCrafting : Table de craft basique
+- `3` - DiagramCrafting : Craft base sur les recettes
+- `4` - StructuralCrafting : Craft de construction/structure
+- `5` - Processing : Interface de fourneau/traitement
+- `6` - Memories : Interface de memoire/journal
+
+**Taille fixe :** 1 octet

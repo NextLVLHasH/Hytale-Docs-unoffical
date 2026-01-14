@@ -1049,3 +1049,471 @@ Window packets handle UI containers like chests, crafting tables, and shops.
 | World Packets | `com/hypixel/hytale/protocol/packets/world/*.java` |
 | Inventory Packets | `com/hypixel/hytale/protocol/packets/inventory/*.java` |
 | Window Packets | `com/hypixel/hytale/protocol/packets/window/*.java` |
+| Camera Packets | `com/hypixel/hytale/protocol/packets/camera/*.java` |
+| Machinima Packets | `com/hypixel/hytale/protocol/packets/machinima/*.java` |
+| Interface Packets | `com/hypixel/hytale/protocol/packets/interface_/*.java` |
+
+---
+
+## Additional Packet Structures
+
+This section documents additional packet categories not covered in the main section above.
+
+### Chat/Communication Packets
+
+Chat packets handle text communication between players and the server.
+
+#### ChatMessage (ID 211)
+
+**Direction:** Client -> Server
+**Compressed:** No
+**Description:** Sends a chat message from the client to the server. Used for player chat input.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Bit 0 = message present |
+| 1 | message | VarString | Variable | Chat message content (max 4,096,000 chars) |
+
+**Fixed Size:** 1 byte (minimum)
+**Max Size:** 16,384,006 bytes
+
+#### ServerMessage (ID 210)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Sends a formatted message from the server to the client. Used for system messages and formatted chat.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Bit 0 = message present |
+| 1 | type | byte | 1 | ChatType enum value |
+| 2 | message | FormattedMessage | Variable | Formatted message content (optional) |
+
+**ChatType Values:**
+- `0` - Chat: Standard chat message
+
+**Fixed Size:** 2 bytes (minimum)
+**Max Size:** 1,677,721,600 bytes
+
+#### Notification (ID 212)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Displays a notification popup to the player. Supports primary/secondary messages, icons, and item displays.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags for optional fields |
+| 1 | style | byte | 1 | NotificationStyle enum value |
+| 2 | messageOffset | int32 LE | 4 | Offset to primary message |
+| 6 | secondaryMessageOffset | int32 LE | 4 | Offset to secondary message |
+| 10 | iconOffset | int32 LE | 4 | Offset to icon string |
+| 14 | itemOffset | int32 LE | 4 | Offset to item data |
+| 18+ | (Variable data) | Variable | Variable | Message, icon, and item data |
+
+**NotificationStyle Values:**
+- `0` - Default: Standard notification
+- `1` - Danger: Red/alert style
+- `2` - Warning: Yellow/caution style
+- `3` - Success: Green/success style
+
+**Fixed Size:** 18 bytes (minimum)
+**Max Size:** 1,677,721,600 bytes
+
+#### KillFeedMessage (ID 213)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Displays a kill feed entry showing who killed whom, with an optional icon (weapon/cause).
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags |
+| 1 | killerOffset | int32 LE | 4 | Offset to killer message |
+| 5 | decedentOffset | int32 LE | 4 | Offset to decedent message |
+| 9 | iconOffset | int32 LE | 4 | Offset to icon string |
+| 13+ | (Variable data) | Variable | Variable | Killer, decedent, and icon data |
+
+**Fixed Size:** 13 bytes (minimum)
+**Max Size:** 1,677,721,600 bytes
+
+#### ShowEventTitle (ID 214)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Displays a title/subtitle overlay on the player's screen with configurable fade animations.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags |
+| 1 | fadeInDuration | float LE | 4 | Fade-in animation duration (seconds) |
+| 5 | fadeOutDuration | float LE | 4 | Fade-out animation duration (seconds) |
+| 9 | duration | float LE | 4 | Display duration (seconds) |
+| 13 | isMajor | byte | 1 | Boolean: large title style |
+| 14 | iconOffset | int32 LE | 4 | Offset to icon string |
+| 18 | primaryTitleOffset | int32 LE | 4 | Offset to primary title |
+| 22 | secondaryTitleOffset | int32 LE | 4 | Offset to secondary title |
+| 26+ | (Variable data) | Variable | Variable | Title content |
+
+**Fixed Size:** 26 bytes (minimum)
+**Max Size:** 1,677,721,600 bytes
+
+#### HideEventTitle (ID 215)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Hides the currently displayed event title with a fade-out animation.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | fadeOutDuration | float LE | 4 | Fade-out duration in seconds |
+
+**Fixed Size:** 4 bytes
+
+---
+
+### Sound Packets
+
+Sound packets handle audio playback on the client.
+
+#### PlaySoundEvent2D (ID 154)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Plays a non-positional (2D) sound, typically for UI sounds or music that should play at consistent volume.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | soundEventIndex | int32 LE | 4 | Sound event ID from asset registry |
+| 4 | category | byte | 1 | SoundCategory enum value |
+| 5 | volumeModifier | float LE | 4 | Volume multiplier (1.0 = normal) |
+| 9 | pitchModifier | float LE | 4 | Pitch multiplier (1.0 = normal) |
+
+**SoundCategory Values:**
+- `0` - Music: Background music
+- `1` - Ambient: Environmental sounds
+- `2` - SFX: Sound effects
+- `3` - UI: Interface sounds
+
+**Fixed Size:** 13 bytes
+
+#### PlaySoundEvent3D (ID 155)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Plays a positional (3D) sound at a specific world location with distance attenuation.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Bit 0 = position present |
+| 1 | soundEventIndex | int32 LE | 4 | Sound event ID |
+| 5 | category | byte | 1 | SoundCategory enum value |
+| 6 | position | Position | 24 | World position (x, y, z as doubles) |
+| 30 | volumeModifier | float LE | 4 | Volume multiplier |
+| 34 | pitchModifier | float LE | 4 | Pitch multiplier |
+
+**Fixed Size:** 38 bytes
+
+#### PlaySoundEventEntity (ID 156)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Plays a sound attached to an entity, following the entity's position.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | soundEventIndex | int32 LE | 4 | Sound event ID |
+| 4 | networkId | int32 LE | 4 | Entity network ID to attach sound to |
+| 8 | volumeModifier | float LE | 4 | Volume multiplier |
+| 12 | pitchModifier | float LE | 4 | Pitch multiplier |
+
+**Fixed Size:** 16 bytes
+
+---
+
+### Weather/Environment Packets
+
+Weather packets control environmental conditions and time of day.
+
+#### UpdateWeather (ID 149)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Changes the current weather state with a transition animation.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | weatherIndex | int32 LE | 4 | Weather type ID from asset registry |
+| 4 | transitionSeconds | float LE | 4 | Duration of weather transition |
+
+**Fixed Size:** 8 bytes
+
+#### UpdateEditorWeatherOverride (ID 150)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Forces a specific weather state in editor mode, bypassing normal weather transitions.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | weatherIndex | int32 LE | 4 | Weather type ID to force |
+
+**Fixed Size:** 4 bytes
+
+#### UpdateEnvironmentMusic (ID 151)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Changes the ambient music based on environment/biome.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | environmentIndex | int32 LE | 4 | Environment ID for music selection |
+
+**Fixed Size:** 4 bytes
+
+#### UpdateTime (ID 146)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Synchronizes the game time between server and client.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Bit 0 = gameTime present |
+| 1 | gameTime | InstantData | 12 | Current game time data |
+
+**Fixed Size:** 13 bytes
+
+---
+
+### Camera Packets
+
+Camera packets control the player's camera view and effects.
+
+#### SetServerCamera (ID 280)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Sets the client camera view mode and optional custom camera settings.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Bit 0 = cameraSettings present |
+| 1 | clientCameraView | byte | 1 | ClientCameraView enum value |
+| 2 | isLocked | byte | 1 | Boolean: prevent player camera control |
+| 3 | cameraSettings | ServerCameraSettings | 154 | Custom camera configuration (optional) |
+
+**ClientCameraView Values:**
+- `0` - FirstPerson: First-person view
+- `1` - ThirdPerson: Third-person view
+- `2` - Custom: Server-controlled custom view
+
+**Fixed Size:** 157 bytes
+
+#### CameraShakeEffect (ID 281)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Applies a camera shake effect for impact feedback, explosions, etc.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | cameraShakeId | int32 LE | 4 | Camera shake preset ID |
+| 4 | intensity | float LE | 4 | Shake intensity multiplier |
+| 8 | mode | byte | 1 | AccumulationMode enum value |
+
+**AccumulationMode Values:**
+- `0` - Set: Replace current shake
+- `1` - Sum: Add to current shake
+- `2` - Average: Blend with current shake
+
+**Fixed Size:** 9 bytes
+
+#### RequestFlyCameraMode (ID 282)
+
+**Direction:** Client -> Server
+**Compressed:** No
+**Description:** Client requests to enter or exit fly camera mode (spectator/cinematic camera).
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | entering | byte | 1 | Boolean: entering (true) or exiting (false) fly mode |
+
+**Fixed Size:** 1 byte
+
+#### SetFlyCameraMode (ID 283)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Server response enabling or disabling fly camera mode.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | entering | byte | 1 | Boolean: entering fly mode state |
+
+**Fixed Size:** 1 byte
+
+---
+
+### Machinima Packets
+
+Machinima packets support cinematic recording and playback features.
+
+#### RequestMachinimaActorModel (ID 260)
+
+**Direction:** Client -> Server
+**Compressed:** No
+**Description:** Client requests actor model data for a machinima scene.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags |
+| 1 | modelIdOffset | int32 LE | 4 | Offset to model ID string |
+| 5 | sceneNameOffset | int32 LE | 4 | Offset to scene name string |
+| 9 | actorNameOffset | int32 LE | 4 | Offset to actor name string |
+| 13+ | (Variable data) | Variable | Variable | String data |
+
+**Fixed Size:** 13 bytes (minimum)
+**Max Size:** 49,152,028 bytes
+
+#### SetMachinimaActorModel (ID 261)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Server sends actor model data for machinima rendering.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags |
+| 1 | modelOffset | int32 LE | 4 | Offset to Model data |
+| 5 | sceneNameOffset | int32 LE | 4 | Offset to scene name |
+| 9 | actorNameOffset | int32 LE | 4 | Offset to actor name |
+| 13+ | (Variable data) | Variable | Variable | Model and string data |
+
+**Fixed Size:** 13 bytes (minimum)
+**Max Size:** 1,677,721,600 bytes
+
+#### UpdateMachinimaScene (ID 262)
+
+**Direction:** Bidirectional
+**Compressed:** Yes (Zstd)
+**Description:** Updates machinima scene state including playback control and scene data.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags |
+| 1 | frame | float LE | 4 | Current animation frame |
+| 5 | updateType | byte | 1 | SceneUpdateType enum value |
+| 6 | playerOffset | int32 LE | 4 | Offset to player name |
+| 10 | sceneNameOffset | int32 LE | 4 | Offset to scene name |
+| 14 | sceneOffset | int32 LE | 4 | Offset to scene data |
+| 18+ | (Variable data) | Variable | Variable | Scene content |
+
+**SceneUpdateType Values:**
+- `0` - Update: General scene update
+- `1` - Play: Start playback
+- `2` - Stop: Stop playback
+- `3` - Frame: Seek to specific frame
+- `4` - Save: Save scene data
+
+**Fixed Size:** 18 bytes (minimum)
+**Max Size:** 36,864,033 bytes
+
+---
+
+### Effect/Particle Packets
+
+Effect packets handle visual effects and post-processing.
+
+#### SpawnParticleSystem (ID 152)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Spawns a particle system at a world position with optional color and scale.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags for optional fields |
+| 1 | position | Position | 24 | World position (optional) |
+| 25 | rotation | Direction | 12 | Rotation angles (optional) |
+| 37 | scale | float LE | 4 | Scale multiplier |
+| 41 | color | Color | 3 | RGB color tint (optional) |
+| 44 | particleSystemId | VarString | Variable | Particle system ID string |
+
+**Fixed Size:** 44 bytes (minimum)
+**Max Size:** 16,384,049 bytes
+
+#### SpawnBlockParticleSystem (ID 153)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Spawns block-based particle effects (breaking, walking, etc.).
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Bit 0 = position present |
+| 1 | blockId | int32 LE | 4 | Block type ID for texture |
+| 5 | particleType | byte | 1 | BlockParticleEvent enum (Walk, Break, etc.) |
+| 6 | position | Position | 24 | World position (optional) |
+
+**Fixed Size:** 30 bytes
+
+#### UpdatePostFxSettings (ID 361)
+
+**Direction:** Server -> Client
+**Compressed:** No
+**Description:** Updates post-processing visual effects settings.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | globalIntensity | float LE | 4 | Overall effect intensity |
+| 4 | power | float LE | 4 | Effect power/strength |
+| 8 | sunshaftScale | float LE | 4 | Sunshaft/godrays scale |
+| 12 | sunIntensity | float LE | 4 | Sun brightness |
+| 16 | sunshaftIntensity | float LE | 4 | Sunshaft effect intensity |
+
+**Fixed Size:** 20 bytes
+
+---
+
+### Window Packets (Extended)
+
+#### UpdateWindow (ID 201)
+
+**Direction:** Server -> Client
+**Compressed:** Yes (Zstd)
+**Description:** Updates an open window's contents without closing and reopening it.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | nullBits | byte | 1 | Presence flags |
+| 1 | id | int32 LE | 4 | Window ID to update |
+| 5 | windowDataOffset | int32 LE | 4 | Offset to JSON window data |
+| 9 | inventoryOffset | int32 LE | 4 | Offset to inventory section |
+| 13 | extraResourcesOffset | int32 LE | 4 | Offset to extra resources |
+| 17+ | (Variable data) | Variable | Variable | Window content |
+
+**Fixed Size:** 17 bytes (minimum)
+**Max Size:** 1,677,721,600 bytes
+
+#### ClientOpenWindow (ID 204)
+
+**Direction:** Client -> Server
+**Compressed:** No
+**Description:** Client requests to open a window of a specific type.
+
+| Offset | Field | Type | Size | Description |
+|--------|-------|------|------|-------------|
+| 0 | type | byte | 1 | WindowType enum value |
+
+**WindowType Values:**
+- `0` - Container: Generic storage container
+- `1` - PocketCrafting: Inventory crafting grid
+- `2` - BasicCrafting: Basic crafting table
+- `3` - DiagramCrafting: Recipe-based crafting
+- `4` - StructuralCrafting: Building/structure crafting
+- `5` - Processing: Furnace/processing UI
+- `6` - Memories: Memory/journal interface
+
+**Fixed Size:** 1 byte

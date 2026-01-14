@@ -117,6 +117,9 @@ export const sidebarConfig: SidebarItem[] = [
           { titleKey: "timeSystem", href: "/docs/modding/plugins/time-system" },
           { titleKey: "projectiles", href: "/docs/modding/plugins/projectiles" },
           { titleKey: "blockHealth", href: "/docs/modding/plugins/block-health" },
+          { titleKey: "collisionSystem", href: "/docs/modding/plugins/collision-system" },
+          { titleKey: "staminaSystem", href: "/docs/modding/plugins/stamina-system" },
+          { titleKey: "prefabSystem", href: "/docs/modding/plugins/prefab-system" },
           {
             titleKey: "events",
             items: [
@@ -216,6 +219,28 @@ export const sidebarConfig: SidebarItem[] = [
                 items: [
                   { titleKey: "discoverInstanceEvent", href: "/docs/modding/plugins/events/instance/discover-instance-event" },
                   { titleKey: "discoverZoneEvent", href: "/docs/modding/plugins/events/zone/discover-zone-event" },
+                ],
+              },
+              {
+                titleKey: "assetEvents",
+                items: [
+                  { titleKey: "registerAssetStoreEvent", href: "/docs/modding/plugins/events/asset/register-asset-store-event" },
+                  { titleKey: "removeAssetStoreEvent", href: "/docs/modding/plugins/events/asset/remove-asset-store-event" },
+                  { titleKey: "loadedAssetsEvent", href: "/docs/modding/plugins/events/asset/loaded-assets-event" },
+                  { titleKey: "removedAssetsEvent", href: "/docs/modding/plugins/events/asset/removed-assets-event" },
+                  { titleKey: "generateAssetsEvent", href: "/docs/modding/plugins/events/asset/generate-assets-event" },
+                  { titleKey: "assetStoreMonitorEvent", href: "/docs/modding/plugins/events/asset/asset-store-monitor-event" },
+                ],
+              },
+              {
+                titleKey: "npcEvents",
+                items: [
+                  { titleKey: "entityEventType", href: "/docs/modding/plugins/events/npc/entity-event-type" },
+                  { titleKey: "blockEventType", href: "/docs/modding/plugins/events/npc/block-event-type" },
+                  { titleKey: "entityEventView", href: "/docs/modding/plugins/events/npc/entity-event-view" },
+                  { titleKey: "blockEventView", href: "/docs/modding/plugins/events/npc/block-event-view" },
+                  { titleKey: "eventNotification", href: "/docs/modding/plugins/events/npc/event-notification" },
+                  { titleKey: "entityEventNotification", href: "/docs/modding/plugins/events/npc/entity-event-notification" },
                 ],
               },
             ],

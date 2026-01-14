@@ -1911,3 +1911,693 @@ Gere les parametres de rayon de vue de la carte du monde.
 /worldmap viewradius set 1024 --bypass
 /worldmap viewradius remove
 ```
+
+---
+
+## Commandes NPC
+
+Commandes pour faire apparaitre et gerer les NPCs (Personnages Non-Joueurs) et entites IA.
+
+### npc spawn
+
+Fait apparaitre une entite NPC avec un role specifie.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc spawn <role> [nombre] [rayon] [drapeaux] [options...]` |
+
+**Parametres :**
+- `role` - Le modele de role NPC a faire apparaitre
+- `nombre` (optionnel) - Nombre de NPCs a faire apparaitre (defaut: 1)
+- `rayon` (optionnel) - Rayon d'apparition autour du joueur (defaut: 8.0)
+- `drapeaux` (optionnel) - Drapeaux de debogage separes par virgules
+- `speed` (optionnel) - Vitesse de velocite initiale
+- `position` (optionnel) - Position exacte d'apparition (format x,y,z)
+- `posOffset` (optionnel) - Decalage de position (format x,y,z)
+- `headRotation` (optionnel) - Rotation de la tete (format lacet,tangage,roulis)
+- `bodyRotation` (optionnel) - Rotation du corps (format lacet,tangage,roulis)
+- `flock` (optionnel) - Taille du groupe ou nom de l'asset de groupe
+- `scale` (optionnel) - Facteur d'echelle du modele
+
+**Drapeaux :**
+- `--nonrandom` - Utiliser un positionnement deterministe
+- `--randomRotation` - Appliquer une rotation aleatoire aux NPCs
+- `--facingRotation` - Faire face au joueur
+- `--test` - Tester la validite de l'emplacement d'apparition
+- `--spawnOnGround` - Forcer l'apparition au niveau du sol
+- `--frozen` - Faire apparaitre le NPC en etat gele
+- `--randomModel` - Appliquer un skin/modele aleatoire
+- `--bypassScaleLimits` - Permettre de depasser les limites d'echelle
+
+**Exemples :**
+```
+/npc spawn Trork
+/npc spawn Kweebec 5 10
+/npc spawn Trork --frozen
+/npc spawn Kweebec --position=100,64,200
+/npc spawn Trork --scale=1.5 --bypassScaleLimits
+```
+
+---
+
+### npc freeze
+
+Gele les entites NPC, arretant leur comportement IA.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc freeze [--all] [--toggle] [entite]` |
+
+**Parametres :**
+- `--all` (drapeau) - Geler tous les NPCs et objets dans le monde
+- `--toggle` (drapeau) - Basculer l'etat de gel au lieu de toujours geler
+- `entite` (optionnel) - ID de l'entite cible (utilise l'entite regardee si non specifie)
+
+**Exemples :**
+```
+/npc freeze
+/npc freeze --all
+/npc freeze --toggle
+/npc freeze 12345
+```
+
+---
+
+### npc thaw
+
+Degele les entites NPC, reprenant leur comportement IA.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc thaw [--all] [entite]` |
+| **Alias** | `unfreeze` |
+
+**Parametres :**
+- `--all` (drapeau) - Degeler tous les NPCs dans le monde
+- `entite` (optionnel) - ID de l'entite cible (utilise l'entite regardee si non specifie)
+
+**Exemples :**
+```
+/npc thaw
+/npc thaw --all
+/npc thaw 12345
+```
+
+---
+
+### npc clean
+
+Supprime toutes les entites NPC du monde actuel.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc clean` |
+
+**Attention :** C'est une commande destructive qui supprime tous les NPCs.
+
+**Exemples :**
+```
+/npc clean
+```
+
+---
+
+### npc dump
+
+Exporte la hierarchie des composants de role NPC dans le journal du serveur.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc dump [--json] [entite]` |
+
+**Parametres :**
+- `--json` (drapeau) - Sortie au format JSON
+- `entite` (optionnel) - ID de l'entite cible (utilise l'entite regardee si non specifie)
+
+**Exemples :**
+```
+/npc dump
+/npc dump --json
+```
+
+---
+
+### npc give
+
+Donne un objet a une entite NPC.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc give <objet> [entite]` |
+
+**Parametres :**
+- `objet` - ID de l'asset d'objet a donner (defini comme arme ou armure)
+- `entite` (optionnel) - ID de l'entite cible
+
+**Sous-commandes :**
+- `/npc give nothing [entite]` - Retirer l'objet tenu du NPC
+
+**Exemples :**
+```
+/npc give Sword_Iron
+/npc give Armor_Trork_Chainmail
+/npc give nothing
+```
+
+---
+
+### npc role
+
+Obtient ou definit le role d'une entite NPC.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc role [role] [entite]` |
+
+**Parametres :**
+- `role` (optionnel) - Nouveau role a assigner. Si non specifie, affiche le role actuel.
+- `entite` (optionnel) - ID de l'entite cible
+
+**Exemples :**
+```
+/npc role
+/npc role Trork_Warrior
+/npc role Kweebec 12345
+```
+
+---
+
+### npc path
+
+Definit un chemin de deplacement pour un NPC.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc path <instructions> [entite]` |
+
+**Parametres :**
+- `instructions` - Paires rotation,distance separees par virgules (ex: "90,5,0,10" = tourner 90deg marcher 5, aller droit 10)
+
+**Sous-commandes :**
+- `/npc path polygon <cotes> [longueur] [entite]` - Creer un chemin polygonal
+
+**Exemples :**
+```
+/npc path 90,5,0,10,-90,3
+/npc path polygon 4
+/npc path polygon 6 10
+```
+
+---
+
+### npc attack
+
+Definit ou efface les surcharges de sequence d'attaque pour un NPC.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc attack [attaque...] [entite]` |
+
+**Sous-commandes :**
+- `/npc attack clear [entite]` - Effacer les surcharges d'attaque
+
+**Parametres :**
+- `attaque` (optionnel) - Liste des IDs d'assets d'interaction pour la sequence d'attaque
+
+**Exemples :**
+```
+/npc attack Slash_Light Slash_Heavy
+/npc attack clear
+```
+
+---
+
+### npc debug
+
+Gere les drapeaux de visualisation de debogage NPC.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc debug <sous-commande>` |
+
+**Sous-commandes :**
+
+| Sous-commande | Syntaxe | Description |
+|---------------|---------|-------------|
+| `show` | `/npc debug show [entite]` | Afficher les drapeaux de debogage actuels |
+| `set` | `/npc debug set <drapeaux> [entite]` | Definir les drapeaux de debogage |
+| `toggle` | `/npc debug toggle <drapeaux> [entite]` | Basculer les drapeaux de debogage |
+| `defaults` | `/npc debug defaults [entite]` | Reinitialiser aux drapeaux par defaut |
+| `clear` | `/npc debug clear [entite]` | Effacer tous les drapeaux de debogage |
+| `presets` | `/npc debug presets [preset]` | Lister les presets ou afficher les infos d'un preset |
+
+**Exemples :**
+```
+/npc debug show
+/npc debug set pathfinding,combat
+/npc debug toggle sensors
+/npc debug presets
+/npc debug defaults
+```
+
+---
+
+### npc step
+
+Avance la simulation NPC d'un tick pendant le gel.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc step [--all] [dt] [entite]` |
+
+**Parametres :**
+- `--all` (drapeau) - Faire avancer tous les NPCs
+- `dt` (optionnel) - Temps delta pour l'avancement (defaut: 1/TPS)
+- `entite` (optionnel) - ID de l'entite cible
+
+**Exemples :**
+```
+/npc step
+/npc step --all
+/npc step 0.05
+```
+
+---
+
+### npc blackboard
+
+Gere les donnees du tableau noir NPC (connaissances IA partagees).
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc blackboard <sous-commande>` |
+
+**Sous-commandes :**
+- `chunks` - Lister les chunks suivis
+- `chunk <x> <z>` - Afficher les donnees du chunk
+- `drop` - Supprimer les donnees du tableau noir
+- `views` - Lister les vues enregistrees
+- `view <type>` - Afficher les donnees d'une vue
+- `blockevents` - Afficher les abonnements aux evenements de blocs
+- `entityevents` - Afficher les abonnements aux evenements d'entites
+- `resourceviews` - Lister les vues de ressources
+- `resourceview <type>` - Afficher les donnees d'une vue de ressources
+- `reserve <position>` - Reserver une interaction a une position
+- `reservation <position>` - Verifier le statut de reservation
+
+**Exemples :**
+```
+/npc blackboard chunks
+/npc blackboard views
+/npc blackboard blockevents
+```
+
+---
+
+### npc flock
+
+Gere le comportement de groupe des NPCs (mouvement de groupe).
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/npc flock <sous-commande>` |
+
+**Sous-commandes :**
+
+| Sous-commande | Syntaxe | Description |
+|---------------|---------|-------------|
+| `grab` | `/npc flock grab` | Ajouter les NPCs en vue a votre groupe |
+| `join` | `/npc flock join` | Rejoindre le groupe d'un NPC en vue |
+| `leave` | `/npc flock leave` | Retirer les NPCs en vue des groupes |
+| `playerleave` | `/npc flock playerleave` | Quitter votre groupe actuel |
+
+**Exemples :**
+```
+/npc flock grab
+/npc flock join
+/npc flock leave
+/npc flock playerleave
+```
+
+---
+
+## Commandes Reseau
+
+Commandes pour le debogage reseau et la simulation de latence.
+
+### network latencysimulation
+
+Simule la latence reseau a des fins de test.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/network latencysimulation <sous-commande>` |
+| **Alias** | `net`, `latsim` |
+
+**Sous-commandes :**
+
+| Sous-commande | Syntaxe | Description |
+|---------------|---------|-------------|
+| `set` | `/network latencysimulation set <delai> [joueur]` | Definir la latence en millisecondes |
+| `reset` | `/network latencysimulation reset [joueur]` | Effacer la latence simulee |
+
+**Exemples :**
+```
+/network latencysimulation set 100
+/net latsim set 200 NomJoueur
+/network latencysimulation reset
+```
+
+---
+
+### network serverknockback
+
+Bascule la prediction de knockback cote serveur.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/network serverknockback` |
+
+**Exemples :**
+```
+/network serverknockback
+```
+
+---
+
+### network debugknockback
+
+Bascule le debogage de position de knockback.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/network debugknockback` |
+
+**Exemples :**
+```
+/network debugknockback
+```
+
+---
+
+## Commandes Prefab
+
+Commandes pour gerer et convertir les structures prefabriquees.
+
+### convertprefabs
+
+Convertit et met a jour les fichiers prefab.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/convertprefabs [--blocks] [--filler] [--relative] [--entities] [--destructive] [chemin] [store]` |
+
+**Parametres :**
+- `--blocks` (drapeau) - Reserialiser les etats de blocs
+- `--filler` (drapeau) - Corriger les donnees de blocs de remplissage
+- `--relative` (drapeau) - Convertir en coordonnees relatives
+- `--entities` (drapeau) - Reserialiser les donnees d'entites
+- `--destructive` (drapeau) - Permettre les modifications destructives
+- `chemin` (optionnel) - Chemin specifique a convertir
+- `store` (optionnel) - Depot de prefab : "asset", "server", "worldgen", ou "all" (defaut: "asset")
+
+**Exemples :**
+```
+/convertprefabs
+/convertprefabs --blocks --entities
+/convertprefabs --filler --destructive
+/convertprefabs store=worldgen
+```
+
+---
+
+## Commandes Assets
+
+Commandes pour gerer et deboguer les assets du jeu.
+
+### assets
+
+Commande parente pour les sous-commandes de gestion des assets.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/assets <sous-commande>` |
+
+**Sous-commandes :**
+- `tags` - Gestion des tags d'assets
+- `duplicates` - Trouver les assets en double
+- `longest` - Trouver les noms d'assets les plus longs par type
+
+**Exemples :**
+```
+/assets tags
+/assets duplicates
+/assets longest
+```
+
+---
+
+## Commandes de Debogage Serveur
+
+Commandes etendues de debogage et surveillance du serveur.
+
+### server gc
+
+Force un cycle de ramasse-miettes.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/server gc` |
+
+**Informations affichees :**
+- Memoire liberee (ou augmentee) par le GC
+
+**Exemples :**
+```
+/server gc
+```
+
+---
+
+### server dump
+
+Cree un dump d'etat du serveur pour le debogage.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/server dump [--json]` |
+
+**Parametres :**
+- `--json` (drapeau) - Exporter au format JSON
+
+**Exemples :**
+```
+/server dump
+/server dump --json
+```
+
+---
+
+## Commandes Sleep
+
+Commandes pour tester et configurer le timing des ticks du serveur.
+
+### sleep offset
+
+Obtient ou definit le decalage de timing de sommeil.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/sleep offset [decalage] [--percent]` |
+
+**Parametres :**
+- `decalage` (optionnel) - Nouvelle valeur de decalage. Si non specifie, affiche la valeur actuelle.
+- `--percent` (drapeau) - Afficher/definir en pourcentage
+
+**Exemples :**
+```
+/sleep offset
+/sleep offset 1000
+/sleep offset --percent
+```
+
+---
+
+### sleep test
+
+Teste la precision du sommeil systeme.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/sleep test [sommeil] [nombre]` |
+
+**Parametres :**
+- `sommeil` (optionnel) - Duree de sommeil en millisecondes (defaut: 10)
+- `nombre` (optionnel) - Nombre d'iterations (defaut: 1000)
+
+**Informations affichees :**
+- Temps delta (min, max, moyenne)
+- Decalage par rapport a l'attendu (min, max, moyenne)
+
+**Exemples :**
+```
+/sleep test
+/sleep test 20 500
+```
+
+---
+
+## Commandes Statistiques de Paquets
+
+Commandes pour analyser les donnees de paquets reseau.
+
+### packetstats
+
+Affiche des statistiques detaillees pour un type de paquet specifique.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/packetstats <paquet> [joueur]` |
+
+**Parametres :**
+- `paquet` - Nom du type de paquet a analyser
+- `joueur` (optionnel) - Joueur cible
+
+**Informations affichees :**
+- ID du paquet
+- Statistiques d'envoi (nombre, taille, compresse/non compresse, moy, min, max)
+- Statistiques de reception
+- Donnees de trafic recent
+
+**Exemples :**
+```
+/packetstats ChunkData
+/packetstats EntityPosition NomJoueur
+```
+
+---
+
+## Commandes Pack
+
+Commandes pour gerer les packs d'assets charges.
+
+### packs list
+
+Liste tous les packs d'assets charges.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/packs list` |
+| **Alias** | `ls` |
+
+**Informations affichees :**
+- Nom du pack
+- Repertoire racine du pack
+
+**Exemples :**
+```
+/packs list
+/packs ls
+```
+
+---
+
+## Commandes Test de Charge
+
+Commandes pour les tests de performance du serveur.
+
+### stresstest start
+
+Demarre un test de charge en faisant apparaitre des clients bots.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/stresstest start [options...]` |
+
+**Parametres :**
+- `name` (optionnel) - Nom du test pour les fichiers de sortie
+- `initcount` (optionnel) - Nombre initial de bots (defaut: 0)
+- `interval` (optionnel) - Secondes entre l'ajout de bots (defaut: 30)
+- `dumptype` (optionnel) - Quand exporter les metriques : NEW_BOT, INTERVAL, FINISH, NEVER
+- `dumpinterval` (optionnel) - Secondes entre les exports (defaut: 300)
+- `threshold` (optionnel) - Seuil de temps de tick en ms
+- `percentile` (optionnel) - Percentile pour le seuil (defaut: 0.95)
+- `viewradius` (optionnel) - Rayon de vue des bots (defaut: 192)
+- `radius` (optionnel) - Rayon de mouvement des bots (defaut: 384)
+- `yheight` (optionnel) - Coordonnee Y des bots (defaut: 125)
+- `flySpeed` (optionnel) - Vitesse de mouvement des bots (defaut: 8.0)
+- `--shutdown` (drapeau) - Arreter le serveur quand le seuil est depasse
+
+**Exemples :**
+```
+/stresstest start
+/stresstest start --initcount=10 --interval=60
+/stresstest start --name=test1 --threshold=50
+```
+
+---
+
+### stresstest stop
+
+Arrete le test de charge en cours.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/stresstest stop` |
+
+**Exemples :**
+```
+/stresstest stop
+```
+
+---
+
+## Commandes Conteneur
+
+Commandes pour gerer les blocs conteneurs et inventaires.
+
+### stash
+
+Obtient ou definit la liste de butin pour un bloc conteneur.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/stash [definir]` |
+
+**Parametres :**
+- `definir` (optionnel) - Nom de la liste de butin a assigner au conteneur cible
+
+**Prerequis :**
+- Doit regarder un bloc conteneur a moins de 10 blocs
+
+**Exemples :**
+```
+/stash
+/stash MaListeDeButin
+```
+
+---
+
+## Commandes Evenement
+
+Commandes pour afficher les notifications d'evenements.
+
+### eventtitle
+
+Affiche un titre d'evenement a tous les joueurs.
+
+| Propriete | Valeur |
+|-----------|--------|
+| **Syntaxe** | `/eventtitle [--major] [--secondary=<texte>] <titre>` |
+
+**Parametres :**
+- `titre` - Texte du titre principal a afficher
+- `--major` (drapeau) - Afficher comme evenement majeur (plus grand)
+- `--secondary` (optionnel) - Texte du sous-titre secondaire (defaut: "Event")
+
+**Exemples :**
+```
+/eventtitle Boss Vaincu !
+/eventtitle --major Victoire !
+/eventtitle --secondary="Evenement Mondial" Le Dragon S'eveille
+```
