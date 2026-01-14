@@ -41,6 +41,7 @@
     "plugins": "Plugins",
     "projectSetup": "Configuration Projet",
     "pluginLifecycle": "Cycle de Vie Plugin",
+    "entityStats": "Stats d'Entité",
     "events": "Événements",
     "eventsOverview": "Vue d'ensemble",
     "playerEvents": "Événements Joueur",

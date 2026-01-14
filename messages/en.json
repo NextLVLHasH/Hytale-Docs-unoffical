@@ -41,6 +41,7 @@
     "plugins": "Plugins",
     "projectSetup": "Project Setup",
     "pluginLifecycle": "Plugin Lifecycle",
+    "entityStats": "Entity Stats",
     "events": "Events",
     "eventsOverview": "Events Overview",
     "playerEvents": "Player Events",

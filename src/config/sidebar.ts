@@ -110,6 +110,7 @@ export const sidebarConfig: SidebarItem[] = [
           { titleKey: "overview", href: "/docs/modding/plugins/overview" },
           { titleKey: "projectSetup", href: "/docs/modding/plugins/project-setup" },
           { titleKey: "pluginLifecycle", href: "/docs/modding/plugins/plugin-lifecycle" },
+          { titleKey: "entityStats", href: "/docs/modding/plugins/entity-stats" },
           {
             titleKey: "events",
             items: [
