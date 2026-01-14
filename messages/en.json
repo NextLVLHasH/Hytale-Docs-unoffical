@@ -163,6 +163,8 @@
     "serverInternals": "Server Internals",
     "serverInternalsOverview": "Overview",
     "pluginSystem": "Plugin System",
+    "modules": "Modules",
+    "modulesOverview": "Overview",
     "eventSystem": "Event System",
     "commandSystem": "Command System",
     "ecsSystem": "ECS System",
