@@ -46,76 +46,100 @@ public class PlaceBlockEvent extends CancellableEcsEvent {
 
 ## Understanding ECS Events
 
-**Important:** ECS events (Entity Component System events) work differently from regular `IEvent` events. They are part of Hytale's component-based architecture and are typically dispatched and handled through the ECS framework rather than the standard `EventBus`.
+**Important:** ECS events (Entity Component System events) work differently from regular `IEvent` events. They do **not** use the EventBus - instead, they require a dedicated `EntityEventSystem` class registered via `getEntityStoreRegistry().registerSystem()`.
 
 Key differences:
 - ECS events extend `EcsEvent` or `CancellableEcsEvent` instead of implementing `IEvent`
-- They are associated with entity components and systems
-- Registration and handling may use different mechanisms than the standard event bus
+- They are dispatched via `entityStore.invoke()` within the ECS framework
+- You must create an `EntityEventSystem` subclass to listen to these events
+- Systems are registered through `getEntityStoreRegistry().registerSystem()`
 
 ## Usage Example
 
+### Step 1: Create the EntityEventSystem
+
+Create a class that extends `EntityEventSystem<EntityStore, PlaceBlockEvent>`:
+
 ```java
-// Note: ECS event registration may differ from standard IEvent registration
-// The exact registration mechanism depends on how your plugin integrates with the ECS system
+package com.example.myplugin.systems;
 
-public class BuildingPlugin extends PluginBase {
+import com.hypixel.hytale.component.Archetype;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.EntityEventSystem;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
 
-    @Override
-    public void onEnable() {
-        // ECS events are typically handled through component systems
-        // This is a conceptual example - actual implementation may vary
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-        // Register to handle PlaceBlockEvent
-        registerEcsEventHandler(PlaceBlockEvent.class, this::onBlockPlace);
+public class BlockPlaceSystem extends EntityEventSystem<EntityStore, PlaceBlockEvent> {
+
+    private static final int MAX_BUILD_HEIGHT = 256;
+
+    public BlockPlaceSystem() {
+        super(PlaceBlockEvent.class);
     }
 
-    private void onBlockPlace(PlaceBlockEvent event) {
+    @Override
+    public void handle(
+            int index,
+            @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+            @Nonnull Store<EntityStore> store,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull PlaceBlockEvent event
+    ) {
         // Get information about the block being placed
-        Vector3i position = event.getTargetBlock();
+        int x = event.getTargetBlock().getX();
+        int y = event.getTargetBlock().getY();
+        int z = event.getTargetBlock().getZ();
         ItemStack blockItem = event.getItemInHand();
         RotationTuple rotation = event.getRotation();
 
-        // Example: Prevent placing blocks in protected areas
-        if (isProtectedArea(position)) {
-            event.setCancelled(true);
-            return;
-        }
-
         // Example: Enforce block placement height limits
-        if (position.y > MAX_BUILD_HEIGHT) {
+        if (y > MAX_BUILD_HEIGHT) {
             event.setCancelled(true);
             return;
         }
 
-        // Example: Modify placement position (snap to grid)
-        Vector3i snappedPosition = snapToGrid(position);
-        event.setTargetBlock(snappedPosition);
-
-        // Example: Force specific rotation for certain blocks
-        // event.setRotation(new RotationTuple(0, 0, 0));
-
-        // Log the placement for tracking
-        logBlockPlacement(position, blockItem);
+        // Example: Log the block placement
+        System.out.println("Block placed at [" + x + "," + y + "," + z + "]");
     }
 
-    private boolean isProtectedArea(Vector3i position) {
-        // Check if position is in a protected region
-        return false;
+    @Nullable
+    @Override
+    public Query<EntityStore> getQuery() {
+        return Archetype.empty(); // Catch events from all entities
     }
-
-    private Vector3i snapToGrid(Vector3i position) {
-        // Grid snapping logic
-        return position;
-    }
-
-    private void logBlockPlacement(Vector3i pos, ItemStack item) {
-        // Logging implementation
-    }
-
-    private static final int MAX_BUILD_HEIGHT = 256;
 }
 ```
+
+### Step 2: Register the System in Your Plugin
+
+In your plugin's `setup()` method, register the system:
+
+```java
+public class MyPlugin extends JavaPlugin {
+
+    public MyPlugin(@Nonnull JavaPluginInit init) {
+        super(init);
+    }
+
+    @Override
+    protected void setup() {
+        // Register the ECS event system
+        getEntityStoreRegistry().registerSystem(new BlockPlaceSystem());
+    }
+}
+```
+
+### Important Notes
+
+- The `getQuery()` method determines which entities this system listens to. Return `Archetype.empty()` to catch events from all entities.
+- ECS events are **not** registered via `EventBus.register()` - that approach will not work for these events.
+- Each ECS event type requires its own `EntityEventSystem` class.
 
 ## When This Event Fires
 

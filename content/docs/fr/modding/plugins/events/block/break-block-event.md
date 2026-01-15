@@ -45,59 +45,103 @@ public class BreakBlockEvent extends CancellableEcsEvent {
 
 ## Comprendre les événements ECS
 
-**Important :** Les événements ECS (Entity Component System) fonctionnent différemment des événements `IEvent` classiques. Ils font partie de l'architecture basee sur les composants de Hytale et sont généralement envoyes et traites via le framework ECS plutot que via l'`EventBus` standard.
+**Important :** Les événements ECS (Entity Component System) fonctionnent différemment des événements `IEvent` classiques. Ils n'utilisent **pas** l'EventBus - ils nécessitent une classe `EntityEventSystem` dédiée enregistrée via `getEntityStoreRegistry().registerSystem()`.
 
-Differences cles :
-- Les événements ECS etendent `EcsEvent` ou `CancellableEcsEvent` au lieu d'implementer `IEvent`
-- Ils sont associes aux composants et systemes d'entites
-- L'enregistrement et le traitement peuvent utiliser des mecanismes differents de l'event bus standard
+Différences clés :
+- Les événements ECS étendent `EcsEvent` ou `CancellableEcsEvent` au lieu d'implémenter `IEvent`
+- Ils sont dispatchés via `entityStore.invoke()` dans le framework ECS
+- Vous devez créer une sous-classe d'`EntityEventSystem` pour écouter ces événements
+- Les systèmes sont enregistrés via `getEntityStoreRegistry().registerSystem()`
 
 ## Exemple d'utilisation
 
+### Étape 1 : Créer l'EntityEventSystem
+
+Créez une classe qui étend `EntityEventSystem<EntityStore, BreakBlockEvent>` :
+
 ```java
-// Note: L'enregistrement des événements ECS peut differer de l'enregistrement standard IEvent
-// Le mecanisme exact d'enregistrement depend de la facon dont votre plugin s'integre au systeme ECS
+package com.example.monplugin.systems;
 
-public class BlockProtectionPlugin extends PluginBase {
+import com.hypixel.hytale.component.Archetype;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.EntityEventSystem;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
 
-    @Override
-    public void onEnable() {
-        // Les événements ECS sont généralement traites via les systemes de composants
-        // Ceci est un exemple conceptuel - l'implementation reelle peut varier
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-        // Enregistrer pour traiter BreakBlockEvent
-        registerEcsEventHandler(BreakBlockEvent.class, this::onBlockBreak);
+public class BlockBreakSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
+
+    public BlockBreakSystem() {
+        super(BreakBlockEvent.class);
     }
 
-    private void onBlockBreak(BreakBlockEvent event) {
+    @Override
+    public void handle(
+            int index,
+            @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+            @Nonnull Store<EntityStore> store,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull BreakBlockEvent event
+    ) {
         // Obtenir des informations sur le bloc en cours de destruction
-        Vector3i position = event.getTargetBlock();
+        int x = event.getTargetBlock().getX();
+        int y = event.getTargetBlock().getY();
+        int z = event.getTargetBlock().getZ();
         BlockType blockType = event.getBlockType();
         ItemStack toolUsed = event.getItemInHand();
 
-        // Exemple: Empecher la destruction de blocs de type bedrock
+        // Exemple : Empêcher la destruction de blocs protégés
         if (isProtectedBlock(blockType)) {
             event.setCancelled(true);
             return;
         }
 
-        // Exemple: Enregistrer les destructions de blocs
-        logBlockBreak(position, blockType, toolUsed);
+        // Exemple : Logger la destruction du bloc
+        System.out.println("Bloc cassé à [" + x + "," + y + "," + z + "] type=" + blockType);
+    }
 
-        // Exemple: Modifier la cible (rediriger la destruction vers un bloc different)
-        // event.setTargetBlock(new Vector3i(position.x, position.y + 1, position.z));
+    @Nullable
+    @Override
+    public Query<EntityStore> getQuery() {
+        return Archetype.empty(); // Attraper les événements de toutes les entités
     }
 
     private boolean isProtectedBlock(BlockType blockType) {
-        // Logique de protection personnalisee
+        // Logique de protection personnalisée
         return false;
-    }
-
-    private void logBlockBreak(Vector3i pos, BlockType type, ItemStack tool) {
-        // Implementation de la journalisation
     }
 }
 ```
+
+### Étape 2 : Enregistrer le système dans votre plugin
+
+Dans la méthode `setup()` de votre plugin, enregistrez le système :
+
+```java
+public class MonPlugin extends JavaPlugin {
+
+    public MonPlugin(@Nonnull JavaPluginInit init) {
+        super(init);
+    }
+
+    @Override
+    protected void setup() {
+        // Enregistrer le système d'événement ECS
+        getEntityStoreRegistry().registerSystem(new BlockBreakSystem());
+    }
+}
+```
+
+### Notes importantes
+
+- La méthode `getQuery()` détermine quelles entités ce système écoute. Retournez `Archetype.empty()` pour attraper les événements de toutes les entités.
+- Les événements ECS ne sont **pas** enregistrés via `EventBus.register()` - cette approche ne fonctionnera pas pour ces événements.
+- Chaque type d'événement ECS nécessite sa propre classe `EntityEventSystem`.
 
 ## Quand cet événement se déclenché
 

@@ -46,76 +46,100 @@ public class PlaceBlockEvent extends CancellableEcsEvent {
 
 ## Comprendre les événements ECS
 
-**Important :** Les événements ECS (Entity Component System) fonctionnent différemment des événements `IEvent` classiques. Ils font partie de l'architecture basee sur les composants de Hytale et sont généralement envoyes et traites via le framework ECS plutot que via l'`EventBus` standard.
+**Important :** Les événements ECS (Entity Component System) fonctionnent différemment des événements `IEvent` classiques. Ils n'utilisent **pas** l'EventBus - ils nécessitent une classe `EntityEventSystem` dédiée enregistrée via `getEntityStoreRegistry().registerSystem()`.
 
-Differences cles :
-- Les événements ECS etendent `EcsEvent` ou `CancellableEcsEvent` au lieu d'implementer `IEvent`
-- Ils sont associes aux composants et systemes d'entites
-- L'enregistrement et le traitement peuvent utiliser des mecanismes differents de l'event bus standard
+Différences clés :
+- Les événements ECS étendent `EcsEvent` ou `CancellableEcsEvent` au lieu d'implémenter `IEvent`
+- Ils sont dispatchés via `entityStore.invoke()` dans le framework ECS
+- Vous devez créer une sous-classe d'`EntityEventSystem` pour écouter ces événements
+- Les systèmes sont enregistrés via `getEntityStoreRegistry().registerSystem()`
 
 ## Exemple d'utilisation
 
+### Étape 1 : Créer l'EntityEventSystem
+
+Créez une classe qui étend `EntityEventSystem<EntityStore, PlaceBlockEvent>` :
+
 ```java
-// Note: L'enregistrement des événements ECS peut differer de l'enregistrement standard IEvent
-// Le mecanisme exact d'enregistrement depend de la facon dont votre plugin s'integre au systeme ECS
+package com.example.monplugin.systems;
 
-public class BuildingPlugin extends PluginBase {
+import com.hypixel.hytale.component.Archetype;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.EntityEventSystem;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
 
-    @Override
-    public void onEnable() {
-        // Les événements ECS sont généralement traites via les systemes de composants
-        // Ceci est un exemple conceptuel - l'implementation reelle peut varier
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-        // Enregistrer pour traiter PlaceBlockEvent
-        registerEcsEventHandler(PlaceBlockEvent.class, this::onBlockPlace);
+public class BlockPlaceSystem extends EntityEventSystem<EntityStore, PlaceBlockEvent> {
+
+    private static final int MAX_BUILD_HEIGHT = 256;
+
+    public BlockPlaceSystem() {
+        super(PlaceBlockEvent.class);
     }
 
-    private void onBlockPlace(PlaceBlockEvent event) {
+    @Override
+    public void handle(
+            int index,
+            @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+            @Nonnull Store<EntityStore> store,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull PlaceBlockEvent event
+    ) {
         // Obtenir des informations sur le bloc en cours de placement
-        Vector3i position = event.getTargetBlock();
+        int x = event.getTargetBlock().getX();
+        int y = event.getTargetBlock().getY();
+        int z = event.getTargetBlock().getZ();
         ItemStack blockItem = event.getItemInHand();
         RotationTuple rotation = event.getRotation();
 
-        // Exemple: Empecher le placement de blocs dans les zones protegees
-        if (isProtectedArea(position)) {
+        // Exemple : Appliquer les limites de hauteur de placement
+        if (y > MAX_BUILD_HEIGHT) {
             event.setCancelled(true);
             return;
         }
 
-        // Exemple: Appliquer les limites de hauteur de placement de blocs
-        if (position.y > MAX_BUILD_HEIGHT) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // Exemple: Modifier la position de placement (aligner sur une grille)
-        Vector3i snappedPosition = snapToGrid(position);
-        event.setTargetBlock(snappedPosition);
-
-        // Exemple: Forcer une rotation spécifique pour certains blocs
-        // event.setRotation(new RotationTuple(0, 0, 0));
-
-        // Enregistrer le placement pour le suivi
-        logBlockPlacement(position, blockItem);
+        // Exemple : Logger le placement du bloc
+        System.out.println("Bloc placé à [" + x + "," + y + "," + z + "]");
     }
 
-    private boolean isProtectedArea(Vector3i position) {
-        // Verifier si la position est dans une region protegee
-        return false;
+    @Nullable
+    @Override
+    public Query<EntityStore> getQuery() {
+        return Archetype.empty(); // Attraper les événements de toutes les entités
     }
-
-    private Vector3i snapToGrid(Vector3i position) {
-        // Logique d'alignement sur la grille
-        return position;
-    }
-
-    private void logBlockPlacement(Vector3i pos, ItemStack item) {
-        // Implementation de la journalisation
-    }
-
-    private static final int MAX_BUILD_HEIGHT = 256;
 }
 ```
+
+### Étape 2 : Enregistrer le système dans votre plugin
+
+Dans la méthode `setup()` de votre plugin, enregistrez le système :
+
+```java
+public class MonPlugin extends JavaPlugin {
+
+    public MonPlugin(@Nonnull JavaPluginInit init) {
+        super(init);
+    }
+
+    @Override
+    protected void setup() {
+        // Enregistrer le système d'événement ECS
+        getEntityStoreRegistry().registerSystem(new BlockPlaceSystem());
+    }
+}
+```
+
+### Notes importantes
+
+- La méthode `getQuery()` détermine quelles entités ce système écoute. Retournez `Archetype.empty()` pour attraper les événements de toutes les entités.
+- Les événements ECS ne sont **pas** enregistrés via `EventBus.register()` - cette approche ne fonctionnera pas pour ces événements.
+- Chaque type d'événement ECS nécessite sa propre classe `EntityEventSystem`.
 
 ## Quand cet événement se déclenché
 

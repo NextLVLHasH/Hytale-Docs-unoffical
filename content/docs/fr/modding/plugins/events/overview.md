@@ -215,6 +215,97 @@ EventRegistration registration = eventBus.register(...);
 registration.unregister();
 ```
 
+## Enregistrement des événements ECS
+
+**Important :** Les événements ECS (étendant `EcsEvent` ou `CancellableEcsEvent`) n'utilisent **pas** l'EventBus. Ils nécessitent une classe `EntityEventSystem` dédiée enregistrée via `getEntityStoreRegistry().registerSystem()`.
+
+### Création d'un système d'événement ECS
+
+Pour écouter les événements ECS comme `BreakBlockEvent`, `PlaceBlockEvent` ou les événements d'inventaire, créez une classe étendant `EntityEventSystem` :
+
+```java
+package com.example.monplugin.systems;
+
+import com.hypixel.hytale.component.Archetype;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.EntityEventSystem;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class BlockBreakSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
+
+    public BlockBreakSystem() {
+        super(BreakBlockEvent.class);
+    }
+
+    @Override
+    public void handle(
+            int index,
+            @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+            @Nonnull Store<EntityStore> store,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull BreakBlockEvent event
+    ) {
+        // Gérer l'événement ici
+        int x = event.getTargetBlock().getX();
+        int y = event.getTargetBlock().getY();
+        int z = event.getTargetBlock().getZ();
+
+        // Annuler si nécessaire
+        // event.setCancelled(true);
+    }
+
+    @Nullable
+    @Override
+    public Query<EntityStore> getQuery() {
+        return Archetype.empty(); // Attraper toutes les entités
+    }
+}
+```
+
+### Enregistrement du système
+
+Dans la méthode `setup()` de votre plugin, enregistrez le système :
+
+```java
+@Override
+protected void setup() {
+    // Enregistrer les systèmes d'événements ECS
+    getEntityStoreRegistry().registerSystem(new BlockBreakSystem());
+    getEntityStoreRegistry().registerSystem(new BlockPlaceSystem());
+    // ... autres systèmes ECS
+}
+```
+
+### Liste des événements ECS
+
+Les événements suivants nécessitent l'enregistrement via `EntityEventSystem` (PAS l'EventBus) :
+
+| Événement | Description |
+|-----------|-------------|
+| `BreakBlockEvent` | Cassage de bloc |
+| `PlaceBlockEvent` | Placement de bloc |
+| `DamageBlockEvent` | Dégâts aux blocs |
+| `UseBlockEvent.Pre/Post` | Interaction avec les blocs |
+| `DropItemEvent` | Lâcher d'objet |
+| `SwitchActiveSlotEvent` | Changement d'emplacement de la barre d'action |
+| `InteractivelyPickupItemEvent` | Ramassage d'objet |
+| `CraftRecipeEvent` | Craft de recette |
+| `ChangeGameModeEvent` | Changement de mode de jeu |
+| `ChunkSaveEvent` | Sauvegarde de chunk |
+| `ChunkUnloadEvent` | Déchargement de chunk |
+| `MoonPhaseChangeEvent` | Changement de phase lunaire |
+| `PrefabPasteEvent` | Collage de prefab |
+| `KillFeedEvent.*` | Messages de kill feed |
+| `DiscoverZoneEvent` | Découverte de zone |
+| `DiscoverInstanceEvent` | Découverte d'instance |
+
 ## Catégories d'événements
 
 ### Événements joueur (14 événements)

@@ -215,6 +215,97 @@ EventRegistration registration = eventBus.register(...);
 registration.unregister();
 ```
 
+## ECS Event Registration
+
+**Important:** ECS events (extending `EcsEvent` or `CancellableEcsEvent`) do **not** use the EventBus. They require a dedicated `EntityEventSystem` class registered via `getEntityStoreRegistry().registerSystem()`.
+
+### Creating an ECS Event System
+
+To listen to ECS events like `BreakBlockEvent`, `PlaceBlockEvent`, or inventory events, create a class extending `EntityEventSystem`:
+
+```java
+package com.example.myplugin.systems;
+
+import com.hypixel.hytale.component.Archetype;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.EntityEventSystem;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+public class BlockBreakSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
+
+    public BlockBreakSystem() {
+        super(BreakBlockEvent.class);
+    }
+
+    @Override
+    public void handle(
+            int index,
+            @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+            @Nonnull Store<EntityStore> store,
+            @Nonnull CommandBuffer<EntityStore> commandBuffer,
+            @Nonnull BreakBlockEvent event
+    ) {
+        // Handle the event here
+        int x = event.getTargetBlock().getX();
+        int y = event.getTargetBlock().getY();
+        int z = event.getTargetBlock().getZ();
+
+        // Cancel if needed
+        // event.setCancelled(true);
+    }
+
+    @Nullable
+    @Override
+    public Query<EntityStore> getQuery() {
+        return Archetype.empty(); // Catch all entities
+    }
+}
+```
+
+### Registering the System
+
+In your plugin's `setup()` method, register the system:
+
+```java
+@Override
+protected void setup() {
+    // Register ECS event systems
+    getEntityStoreRegistry().registerSystem(new BlockBreakSystem());
+    getEntityStoreRegistry().registerSystem(new BlockPlaceSystem());
+    // ... other ECS systems
+}
+```
+
+### ECS Events List
+
+The following events require `EntityEventSystem` registration (NOT EventBus):
+
+| Event | Description |
+|-------|-------------|
+| `BreakBlockEvent` | Block breaking |
+| `PlaceBlockEvent` | Block placement |
+| `DamageBlockEvent` | Block damage |
+| `UseBlockEvent.Pre/Post` | Block interaction |
+| `DropItemEvent` | Item dropping |
+| `SwitchActiveSlotEvent` | Hotbar slot change |
+| `InteractivelyPickupItemEvent` | Item pickup |
+| `CraftRecipeEvent` | Recipe crafting |
+| `ChangeGameModeEvent` | Game mode change |
+| `ChunkSaveEvent` | Chunk saving |
+| `ChunkUnloadEvent` | Chunk unloading |
+| `MoonPhaseChangeEvent` | Moon phase change |
+| `PrefabPasteEvent` | Prefab pasting |
+| `KillFeedEvent.*` | Kill feed messages |
+| `DiscoverZoneEvent` | Zone discovery |
+| `DiscoverInstanceEvent` | Instance discovery |
+
 ## Event Categories
 
 ### Player Events (14 events)
