@@ -81,8 +81,8 @@ export function TableOfContents({ items }: TableOfContentsProps) {
             {t("title")}
           </h2>
           <ul className="space-y-2">
-            {items.map((item) => (
-              <li key={item.id}>
+            {items.map((item, index) => (
+              <li key={`${item.id}-${index}`}>
                 <a
                   href={`#${item.id}`}
                   onClick={(e) => handleClick(e, item.id)}
