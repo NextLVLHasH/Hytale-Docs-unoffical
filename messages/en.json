@@ -741,6 +741,12 @@
         "step1": "Tap the menu button (three dots) and select \"Add to Home screen\" or \"Install app\"",
         "gotIt": "Got it!"
       }
+    },
+    "openApp": {
+      "title": "HytaleDocs is installed",
+      "description": "Open the app for a better experience",
+      "openButton": "Open App",
+      "continueInBrowser": "Stay in browser"
     }
   }
 }

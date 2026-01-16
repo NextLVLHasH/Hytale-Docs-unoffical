@@ -17,6 +17,9 @@ declare global {
   interface WindowEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
   }
+  interface Navigator {
+    getInstalledRelatedApps?: () => Promise<{ platform: string; url: string }[]>;
+  }
 }
 
 export interface PWAContextType {
@@ -28,12 +31,15 @@ export interface PWAContextType {
   // Install prompt state
   canInstall: boolean;
   isInstalled: boolean;
+  isRunningStandalone: boolean;
   isIOS: boolean;
   isAndroid: boolean;
   isSafari: boolean;
   showInstallPrompt: boolean;
+  showOpenAppPrompt: boolean;
   installApp: () => Promise<void>;
   dismissInstallPrompt: () => void;
+  dismissOpenAppPrompt: () => void;
   remindLater: () => void;
 }
 
@@ -41,6 +47,7 @@ const PWAContext = React.createContext<PWAContextType | undefined>(undefined);
 
 const INSTALL_DISMISSED_KEY = "pwa-install-dismissed";
 const INSTALL_REMIND_KEY = "pwa-install-remind-at";
+const OPEN_APP_DISMISSED_KEY = "pwa-open-app-dismissed";
 const REMIND_DELAY_DAYS = 7;
 
 function isInstallDismissed(): boolean {
@@ -54,6 +61,20 @@ function setInstallDismissed(dismissed: boolean): void {
     localStorage.setItem(INSTALL_DISMISSED_KEY, "true");
   } else {
     localStorage.removeItem(INSTALL_DISMISSED_KEY);
+  }
+}
+
+function isOpenAppDismissed(): boolean {
+  if (typeof window === "undefined") return true;
+  return localStorage.getItem(OPEN_APP_DISMISSED_KEY) === "true";
+}
+
+function setOpenAppDismissed(dismissed: boolean): void {
+  if (typeof window === "undefined") return;
+  if (dismissed) {
+    localStorage.setItem(OPEN_APP_DISMISSED_KEY, "true");
+  } else {
+    localStorage.removeItem(OPEN_APP_DISMISSED_KEY);
   }
 }
 
@@ -85,8 +106,10 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
   // Install state
   const [deferredPrompt, setDeferredPrompt] = React.useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = React.useState(true); // Default true to prevent flash
+  const [isInstalled, setIsInstalled] = React.useState(false);
+  const [isRunningStandalone, setIsRunningStandalone] = React.useState(true); // Default true to prevent flash
   const [showInstallPrompt, setShowInstallPrompt] = React.useState(false);
+  const [showOpenAppPrompt, setShowOpenAppPrompt] = React.useState(false);
   const [isIOS, setIsIOS] = React.useState(false);
   const [isAndroid, setIsAndroid] = React.useState(false);
   const [isSafari, setIsSafari] = React.useState(false);
@@ -102,21 +125,51 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     setIsAndroid(isAndroidDevice);
     setIsSafari(isSafariBrowser);
 
-    // Check if already installed
+    // Check if running in standalone mode (already opened as PWA)
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       // @ts-expect-error - iOS Safari specific property
       window.navigator.standalone === true;
 
-    setIsInstalled(isStandalone);
+    setIsRunningStandalone(isStandalone);
 
-    // Only show install prompt after delay and if not dismissed
-    if (!isStandalone && !isInstallDismissed() && shouldShowReminder()) {
-      const timer = setTimeout(() => {
-        setShowInstallPrompt(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
+    // Check if app is installed using getInstalledRelatedApps API
+    const checkIfInstalled = async () => {
+      try {
+        if (navigator.getInstalledRelatedApps) {
+          const relatedApps = await navigator.getInstalledRelatedApps();
+          if (relatedApps.length > 0) {
+            setIsInstalled(true);
+            // Show "Open app" prompt if not in standalone and not dismissed
+            if (!isStandalone && !isOpenAppDismissed()) {
+              setTimeout(() => setShowOpenAppPrompt(true), 2000);
+            }
+            return;
+          }
+        }
+      } catch (error) {
+        console.log("[PWA] getInstalledRelatedApps not supported");
+      }
+
+      // Fallback: Check localStorage for installation record
+      if (localStorage.getItem("pwa-was-installed") === "true") {
+        setIsInstalled(true);
+        if (!isStandalone && !isOpenAppDismissed()) {
+          setTimeout(() => setShowOpenAppPrompt(true), 2000);
+        }
+        return;
+      }
+
+      // Not installed - show install prompt if conditions are met
+      if (!isStandalone && !isInstallDismissed() && shouldShowReminder()) {
+        const timer = setTimeout(() => {
+          setShowInstallPrompt(true);
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    checkIfInstalled();
   }, []);
 
   // Listen for beforeinstallprompt event
@@ -133,6 +186,8 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       setIsInstalled(true);
       setShowInstallPrompt(false);
       setDeferredPrompt(null);
+      // Store that app was installed
+      localStorage.setItem("pwa-was-installed", "true");
     };
 
     window.addEventListener("appinstalled", handleAppInstalled);
@@ -206,6 +261,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         if (outcome === "accepted") {
           setIsInstalled(true);
           setShowInstallPrompt(false);
+          localStorage.setItem("pwa-was-installed", "true");
         }
         setDeferredPrompt(null);
       } catch (error) {
@@ -217,6 +273,11 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   const dismissInstallPrompt = React.useCallback(() => {
     setShowInstallPrompt(false);
     setInstallDismissed(true);
+  }, []);
+
+  const dismissOpenAppPrompt = React.useCallback(() => {
+    setShowOpenAppPrompt(false);
+    setOpenAppDismissed(true);
   }, []);
 
   const remindLater = React.useCallback(() => {
@@ -235,12 +296,15 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     // Install
     canInstall,
     isInstalled,
+    isRunningStandalone,
     isIOS,
     isAndroid,
     isSafari,
-    showInstallPrompt: showInstallPrompt && !isInstalled,
+    showInstallPrompt: showInstallPrompt && !isInstalled && !isRunningStandalone,
+    showOpenAppPrompt: showOpenAppPrompt && isInstalled && !isRunningStandalone,
     installApp,
     dismissInstallPrompt,
+    dismissOpenAppPrompt,
     remindLater,
   };
 

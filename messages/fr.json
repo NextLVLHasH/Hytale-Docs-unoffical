@@ -741,6 +741,12 @@
         "step1": "Appuyez sur le menu (trois points) et selectionnez \"Ajouter a l'ecran d'accueil\" ou \"Installer l'application\"",
         "gotIt": "Compris !"
       }
+    },
+    "openApp": {
+      "title": "HytaleDocs est installe",
+      "description": "Ouvrez l'app pour une meilleure experience",
+      "openButton": "Ouvrir l'app",
+      "continueInBrowser": "Rester dans le navigateur"
     }
   }
 }

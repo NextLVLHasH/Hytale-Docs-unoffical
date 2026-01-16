@@ -26,6 +26,10 @@ export function UpdateNotification() {
   const handleUpdate = () => {
     setIsUpdating(true);
     updateServiceWorker();
+    // Reload after a short delay to allow SW to activate
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const handleDismiss = () => {

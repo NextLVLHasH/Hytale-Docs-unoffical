@@ -7,7 +7,7 @@ import { CookieConsent } from "@/components/cookie-consent";
 import { CookiePreferencesDialog } from "@/components/cookie-preferences";
 import { AdblockDetector } from "@/components/ads";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
-import { ServiceWorkerRegister, UpdateNotification, InstallPrompt } from "@/components/pwa";
+import { ServiceWorkerRegister, UpdateNotification, InstallPrompt, OpenAppPrompt } from "@/components/pwa";
 import { PWAProvider } from "@/contexts/pwa-context";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -212,6 +212,7 @@ export default async function LocaleLayout({
                 <CookiePreferencesDialog />
                 <UpdateNotification />
                 <InstallPrompt />
+                <OpenAppPrompt />
               </PWAProvider>
             </CookieConsentProvider>
             <AdblockDetector />
