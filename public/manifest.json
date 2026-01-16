@@ -13,13 +13,13 @@
   "icons": [
     {
       "src": "/logo-h.png",
-      "sizes": "129x186",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "/logo-h.png",
-      "sizes": "129x186",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }
