@@ -40,15 +40,15 @@ These providers have **official Hytale plugins** for easy server management:
 
 These providers offer quality Hytale hosting:
 
-| Provider | Type | Starting Price | Notes |
+| Provider | Type | Starting Price(per month) | Notes |
 |----------|------|----------------|-------|
-| **Nitrado** | Game Host | Varies | Official partner |
-| **Apex Hosting** | Game Host | Varies | Official partner |
-| **PebbleHost** | Game Host | Budget-friendly | Good value |
-| **Game Host Bros** | Game Host | Varies | Community favorite |
-| **WinterNode** | Game Host | Varies | Good performance |
-| **BerryByte** | Game Host | Varies | Quality support |
-| **Shockbyte** | Game Host | Budget-friendly | Easy setup |
+| **Nitrado** | Game Host | $12.99 | Official partner |
+| **Apex Hosting** | Game Host | $14.99(first month is $11.24) | Official partner |
+| **PebbleHost** | Game Host | $4.00 | Good value |
+| **Game Host Bros** | Game Host | $7.99 | Community favorite |
+| **WinterNode** | Game Host | $7.96 | Good performance |
+| **BerryByte** | Game Host | $9.95(first month is $8.96) | Quality support |
+| **Shockbyte** | Game Host | $12.50(first month is $10.62) | Easy setup |
 
 ## Choosing a Provider
 

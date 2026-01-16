@@ -32,8 +32,8 @@ The Hypixel Minecraft server is known for popular minigames like SkyWars, BedWar
 | **Mod Installation** | Automatic (server-side) | Manual client installation |
 | **Graphics** | Stylized, smooth animations | Classic pixelated |
 | **Creation Tools** | Built-in professional suite | Third-party tools |
-| **Multiplayer** | Native server support | Third-party servers |
-| **Distribution** | Official launcher only | Multiple stores |
+| **Multiplayer** | Third-party servers with an offical server coming soon | Third-party servers |
+| **Distribution** | Official launcher only | Multiple launchers |
 
 ## Combat System
 
