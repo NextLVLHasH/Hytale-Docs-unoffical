@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { X, ChevronDown, ChevronUp, BookOpen, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -21,10 +21,14 @@ const STORAGE_KEY = "hytaledocs-progress-dismissed";
 
 export function DocumentationProgress() {
   const t = useTranslations("docProgress");
-  const [isVisible, setIsVisible] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return !sessionStorage.getItem(STORAGE_KEY);
-  });
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem(STORAGE_KEY);
+    if (!dismissed) {
+      setIsVisible(true);
+    }
+  }, []);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, X, ExternalLink } from "lucide-react";
 
@@ -8,10 +8,14 @@ const STORAGE_KEY = "hytaledocs-disclaimer-dismissed";
 
 export function DocsDisclaimer() {
   const t = useTranslations("docsDisclaimer");
-  const [isVisible, setIsVisible] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return !sessionStorage.getItem(STORAGE_KEY);
-  });
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem(STORAGE_KEY);
+    if (!dismissed) {
+      setIsVisible(true);
+    }
+  }, []);
 
   const handleDismiss = () => {
     sessionStorage.setItem(STORAGE_KEY, "true");
