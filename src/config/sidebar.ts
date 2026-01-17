@@ -133,7 +133,7 @@ export const sidebarConfig: SidebarItem[] = [
                   { titleKey: "drainPlayerFromWorldEvent", href: "/docs/modding/plugins/events/player/drain-player-from-world-event", verified: true },
                   { titleKey: "playerInteractEvent", href: "/docs/modding/plugins/events/player/player-interact-event", nonFunctional: true },
                   { titleKey: "playerCraftEvent", href: "/docs/modding/plugins/events/player/player-craft-event", verified: true },
-                  { titleKey: "changeGameModeEvent", href: "/docs/modding/plugins/events/player/change-game-mode-event" },
+                  { titleKey: "changeGameModeEvent", href: "/docs/modding/plugins/events/player/change-game-mode-event", verified: true },
                 ],
               },
               {
