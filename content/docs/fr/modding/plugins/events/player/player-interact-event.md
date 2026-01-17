@@ -6,11 +6,13 @@ sidebar_label: PlayerInteractEvent
 
 # PlayerInteractEvent
 
-:::warning Obsolete
-Cet événement est obsolete. Envisagez d'utiliser [PlayerMouseButtonEvent](./player-mouse-button-event.md) pour les interactions a la souris a la place.
+:::danger Événement non fonctionnel
+**Cet événement est obsolète ET n'est jamais déclenché par le serveur.** La classe de l'événement existe mais rien dans le code du serveur ne le crée ou ne le dispatche. Toute la gestion des interactions a été déplacée vers [PlayerMouseButtonEvent](./player-mouse-button-event.md).
+
+N'utilisez pas cet événement dans de nouveaux plugins - il ne se déclenchera jamais.
 :::
 
-Déclenché lorsqu'un joueur interagit avec le monde (blocs, entites ou objets). C'est un événement annulable qui permet aux plugins d'empêcher ou de modifier les interactions.
+~~Déclenché lorsqu'un joueur interagit avec le monde (blocs, entités ou objets).~~ Cet événement n'est plus fonctionnel.
 
 ## Informations sur l'événement
 
@@ -20,7 +22,8 @@ Déclenché lorsqu'un joueur interagit avec le monde (blocs, entites ou objets).
 | **Classe parente** | `PlayerEvent<String>` |
 | **Annulable** | Oui |
 | **Asynchrone** | Non |
-| **Obsolete** | Oui |
+| **Obsolète** | Oui |
+| **Statut** | **Non fonctionnel** - Jamais déclenché par le serveur |
 | **Fichier source** | `decompiled/com/hypixel/hytale/server/core/event/events/player/PlayerInteractEvent.java:14` |
 
 ## Declaration
@@ -117,7 +120,25 @@ eventBus.register(PlayerInteractEvent.class, event -> {
 
 ## Avis de migration
 
-Cet événement est obsolete et pourrait etre supprime dans les versions futures. Pour les interactions avec les boutons de la souris, migrez vers [PlayerMouseButtonEvent](./player-mouse-button-event.md) qui fournit des informations plus détaillées sur les entrees de la souris.
+:::tip Migration requise
+Cet événement est **non fonctionnel** - vous devez migrer vers [PlayerMouseButtonEvent](./player-mouse-button-event.md) immédiatement. Le `PlayerMouseButtonEvent` est créé dans `InteractionModule.java:872` et fournit des informations sur les boutons de la souris incluant le type de bouton, l'état et le nombre de clics.
+:::
+
+## Résultats des tests
+
+> **Testé :** 17 janvier 2026 - Vérifié avec le plugin doc-test
+
+**Résultat du test : L'événement ne se déclenche PAS**
+
+- Commande de test : `/doctest test-player-interact-event`
+- Actions testées : Clic droit sur des blocs, clic droit sur des entités
+- Résultat : Aucun événement détecté
+
+**Analyse du code décompilé :**
+- `PlayerMouseButtonEvent` est créé dans `InteractionModule.java:872`
+- `PlayerMouseMotionEvent` est créé dans `InteractionModule.java:893`
+- `PlayerInteractEvent` n'est **jamais instancié** nulle part dans le code
+- Les listeners existants (BlockEventView, EntityEventView, CameraDemo) sont du code mort
 
 ## Référence source
 

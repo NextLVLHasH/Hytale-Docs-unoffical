@@ -6,11 +6,13 @@ sidebar_label: PlayerInteractEvent
 
 # PlayerInteractEvent
 
-:::warning Deprecated
-This event is deprecated. Consider using [PlayerMouseButtonEvent](./player-mouse-button-event.md) for mouse interactions instead.
+:::danger Non-Functional Event
+**This event is deprecated AND never fired by the server.** The event class exists but nothing in the server code creates or dispatches it. All interaction handling has been moved to [PlayerMouseButtonEvent](./player-mouse-button-event.md).
+
+Do not use this event in new plugins - it will never trigger.
 :::
 
-Fired when a player interacts with the world (blocks, entities, or items). This is a cancellable event that allows plugins to prevent or modify interactions.
+~~Fired when a player interacts with the world (blocks, entities, or items).~~ This event is no longer functional.
 
 ## Event Information
 
@@ -21,6 +23,7 @@ Fired when a player interacts with the world (blocks, entities, or items). This 
 | **Cancellable** | Yes |
 | **Async** | No |
 | **Deprecated** | Yes |
+| **Status** | **Non-Functional** - Never fired by the server |
 | **Source File** | `decompiled/com/hypixel/hytale/server/core/event/events/player/PlayerInteractEvent.java:14` |
 
 ## Declaration
@@ -117,7 +120,25 @@ eventBus.register(PlayerInteractEvent.class, event -> {
 
 ## Migration Notice
 
-This event is deprecated and may be removed in future versions. For mouse button interactions, migrate to [PlayerMouseButtonEvent](./player-mouse-button-event.md) which provides more detailed information about mouse input.
+:::tip Required Migration
+This event is **non-functional** - you must migrate to [PlayerMouseButtonEvent](./player-mouse-button-event.md) immediately. The `PlayerMouseButtonEvent` is created in `InteractionModule.java:872` and provides mouse button information including button type, state, and click count.
+:::
+
+## Testing Results
+
+> **Tested:** January 17, 2026 - Verified with doc-test plugin
+
+**Test Result: Event does NOT fire**
+
+- Test command: `/doctest test-player-interact-event`
+- Actions tested: Right-click on blocks, right-click on entities
+- Result: No event detected
+
+**Analysis of decompiled code:**
+- `PlayerMouseButtonEvent` is created at `InteractionModule.java:872`
+- `PlayerMouseMotionEvent` is created at `InteractionModule.java:893`
+- `PlayerInteractEvent` is **never instantiated** anywhere in the codebase
+- Existing listeners (BlockEventView, EntityEventView, CameraDemo) are dead code
 
 ## Source Reference
 
