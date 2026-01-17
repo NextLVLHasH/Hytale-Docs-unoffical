@@ -186,6 +186,148 @@ You can use `setRotation()` to:
 - Implement auto-rotation features
 - Create building assistance tools
 
+## Practical Examples
+
+### Getting Entity UUID from ECS Event
+
+To identify which player/entity triggered the event, use `UUIDComponent`:
+
+```java
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
+
+@Override
+public void handle(
+        int index,
+        @Nonnull ArchetypeChunk<EntityStore> archetypeChunk,
+        @Nonnull Store<EntityStore> store,
+        @Nonnull CommandBuffer<EntityStore> commandBuffer,
+        @Nonnull PlaceBlockEvent event
+) {
+    // Get entity reference from the archetype chunk
+    Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
+
+    // Get UUID component to identify the entity
+    UUIDComponent uuidComponent = store.getComponent(ref, UUIDComponent.getComponentType());
+    if (uuidComponent != null) {
+        UUID entityUuid = uuidComponent.getUuid();
+        // Now you can identify who placed the block
+    }
+}
+```
+
+### Block Protection System
+
+```java
+@Override
+public void handle(..., @Nonnull PlaceBlockEvent event) {
+    Vector3i pos = event.getTargetBlock();
+
+    // Check if position is in a protected region
+    if (isProtectedArea(pos.getX(), pos.getY(), pos.getZ())) {
+        event.setCancelled(true);
+        return;
+    }
+
+    // Check for restricted block types
+    ItemStack item = event.getItemInHand();
+    if (item != null && isRestrictedBlock(item.getItemId())) {
+        event.setCancelled(true);
+    }
+}
+```
+
+### Redirecting Block Placement
+
+```java
+@Override
+public void handle(..., @Nonnull PlaceBlockEvent event) {
+    Vector3i original = event.getTargetBlock();
+
+    // Redirect placement one block higher
+    Vector3i redirected = new Vector3i(
+        original.getX(),
+        original.getY() + 1,
+        original.getZ()
+    );
+    event.setTargetBlock(redirected);
+}
+```
+
+## Internal Details
+
+### Event Processing Chain
+
+```
+Player/Entity places block
+         ↓
+BlockPlaceUtils.placeBlock() called
+         ↓
+PlaceBlockEvent created with itemStack, position, rotation
+         ↓
+entityStore.invoke(ref, event) dispatches to all systems
+         ↓
+EntityEventSystem.handle() called for each registered system
+         ↓
+If event.isCancelled() → block section invalidated, placement stopped
+         ↓
+If not cancelled → block placed in world
+```
+
+### Where the Event is Fired
+
+The event is created and invoked in `BlockPlaceUtils.placeBlock()`:
+
+**File:** `com/hypixel/hytale/server/core/modules/interaction/BlockPlaceUtils.java`
+
+```java
+// Line 105-106
+PlaceBlockEvent event = new PlaceBlockEvent(itemStack, blockPosition, targetRotation);
+entityStore.invoke(ref, event);
+```
+
+### Cancellation Implementation
+
+When the event is cancelled, the following code executes (lines 107-108):
+
+```java
+if (event.isCancelled()) {
+    targetBlockSection.invalidateBlock(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+}
+```
+
+This invalidates the block section at the target position, preventing the block from being placed.
+
+### Class Hierarchy
+
+```
+Object
+  └─ EcsEvent (abstract)
+       └─ CancellableEcsEvent (abstract)
+            └─ PlaceBlockEvent
+```
+
+**Interfaces:** `ICancellableEcsEvent` (via CancellableEcsEvent)
+
+### Server Handler
+
+The server uses `BlockHealthModule.PlaceBlockEventSystem` to mark newly placed blocks as "fragile" for a configurable duration:
+
+**File:** `com/hypixel/hytale/server/core/modules/blockhealth/BlockHealthModule.java` (lines 249-286)
+
+## Testing
+
+> **Tested:** January 17, 2026 - Verified with doc-test plugin
+
+To test this event:
+1. Run `/doctest test-place-block-event`
+2. Place any block in the world
+3. The event should fire and display details including:
+   - `itemInHand`: The block item ID and quantity
+   - `targetBlock`: The [x, y, z] position
+   - `rotation`: The block rotation
+   - `isCancelled`: The cancellation state
+
 ## Related Events
 
 - [BreakBlockEvent](./break-block-event) - Fired when a block is broken
@@ -195,3 +337,7 @@ You can use `setRotation()` to:
 ## Source Reference
 
 `decompiled/com/hypixel/hytale/server/core/event/events/ecs/PlaceBlockEvent.java:11`
+
+---
+
+> **Last updated:** January 17, 2026 - Tested and verified. Added practical examples and internal details.
