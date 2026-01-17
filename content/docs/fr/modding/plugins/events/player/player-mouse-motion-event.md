@@ -6,6 +6,8 @@ sidebar_label: PlayerMouseMotionEvent
 
 # PlayerMouseMotionEvent
 
+> **⚠️ Attention :** Cet événement **ne se déclenche pas** actuellement en pratique. Bien que la classe d'événement existe dans le code serveur et que les listeners peuvent être enregistrés (avec `hasListener()` retournant `true`), le client Hytale n'envoie pas de paquets de mouvement de souris au serveur. Cela pourrait changer dans les versions futures. Testé en janvier 2026.
+
 Déclenché lorsqu'un joueur deplace sa souris. C'est un événement annulable qui fournit des informations sur le mouvement de la souris, incluant la position actuelle a l'ecran et les blocs ou entites sous le curseur.
 
 ## Informations sur l'événement
@@ -135,6 +137,39 @@ Soyez attentif aux performances lors de la gestion de cet événement, car il pe
 - Limiter les mises a jour pour reduire la charge de traitement
 - Utiliser des structures de donnees efficaces pour le suivi de l'etat de survol
 - Eviter les calculs lourds dans le handler d'événement
+
+## Détails internes
+
+### Lieu de déclenchement de l'événement
+
+L'événement est dispatché dans `InteractionModule.java` (lignes 888-897) :
+
+```java
+IEventDispatcher<PlayerMouseMotionEvent, PlayerMouseMotionEvent> dispatcher = HytaleServer.get()
+   .getEventBus()
+   .dispatchFor(PlayerMouseMotionEvent.class);
+if (dispatcher.hasListener()) {
+   dispatcher.dispatch(new PlayerMouseMotionEvent(...));
+}
+```
+
+**Important :** Le serveur ne dispatch cet événement que lorsque :
+1. Un listener est enregistré (`hasListener()` retourne `true`)
+2. Le client envoie un paquet d'interaction SANS appui sur un bouton de souris (`packet.mouseButton == null`)
+
+### Structure du protocole MouseMotionEvent
+
+L'objet `MouseMotionEvent` du protocole contient :
+- `relativeMotion` (`Vector2i`) : Le mouvement relatif de la souris (delta x, y)
+- `mouseButtonType[]` : Tableau des boutons de souris actuellement pressés (si applicable)
+
+### Résultats des tests
+
+- **Testé :** 17 janvier 2026
+- **Résultat :** L'événement NE se déclenche PAS
+- **Raison :** Le client n'envoie pas de paquets de mouvement de souris au serveur
+- **Enregistrement :** Fonctionne correctement (`hasListener()` retourne `true` après enregistrement)
+- **Note :** Doit être enregistré sur `HytaleServer.get().getEventBus()` directement pour que `hasListener()` fonctionne
 
 ## Référence source
 

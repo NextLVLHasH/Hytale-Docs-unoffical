@@ -6,6 +6,8 @@ sidebar_label: PlayerMouseMotionEvent
 
 # PlayerMouseMotionEvent
 
+> **⚠️ Warning:** This event currently **does not fire** in practice. While the event class exists in the server code and listeners can be registered (with `hasListener()` returning `true`), the Hytale client does not appear to send mouse motion packets to the server. This may change in future versions. Tested January 2026.
+
 Fired when a player moves their mouse. This is a cancellable event that provides information about mouse movement, including the current screen position and any blocks or entities under the cursor.
 
 ## Event Information
@@ -135,6 +137,39 @@ Be mindful of performance when handling this event, as it can fire very frequent
 - Throttling updates to reduce processing overhead
 - Using efficient data structures for hover state tracking
 - Avoiding heavy computations in the event handler
+
+## Internal Details
+
+### Event Firing Location
+
+The event is dispatched in `InteractionModule.java` (lines 888-897):
+
+```java
+IEventDispatcher<PlayerMouseMotionEvent, PlayerMouseMotionEvent> dispatcher = HytaleServer.get()
+   .getEventBus()
+   .dispatchFor(PlayerMouseMotionEvent.class);
+if (dispatcher.hasListener()) {
+   dispatcher.dispatch(new PlayerMouseMotionEvent(...));
+}
+```
+
+**Important:** The server only dispatches this event when:
+1. A listener is registered (`hasListener()` returns `true`)
+2. The client sends an interaction packet WITHOUT a mouse button press (`packet.mouseButton == null`)
+
+### MouseMotionEvent Protocol Structure
+
+The `MouseMotionEvent` object from the protocol contains:
+- `relativeMotion` (`Vector2i`): The relative mouse movement (delta x, y)
+- `mouseButtonType[]`: Array of currently pressed mouse buttons (if any)
+
+### Testing Results
+
+- **Tested:** January 17, 2026
+- **Result:** Event does NOT fire
+- **Reason:** Client does not send mouse motion packets to the server
+- **Registration:** Works correctly (`hasListener()` returns `true` after registration)
+- **Note:** Must register on `HytaleServer.get().getEventBus()` directly for `hasListener()` to work
 
 ## Source Reference
 
