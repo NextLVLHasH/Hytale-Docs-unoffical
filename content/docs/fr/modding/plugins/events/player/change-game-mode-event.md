@@ -209,9 +209,55 @@ getServer().getEventBus().register(
 - **[CraftRecipeEvent](./craft-recipe-event.md)** - La fabrication peut dépendre du mode
 - **LivingEntityInventoryChangeEvent** - Changements d'inventaire déclenchés par les changements de mode
 
+## Détails internes
+
+### Où l'événement est déclenché
+
+Le `ChangeGameModeEvent` est déclenché dans `Player.java` (ligne 734) lorsque le mode de jeu d'un joueur change :
+
+```java
+// Depuis Player.java:734
+GameMode oldGameMode = playerComponent.gameMode;
+if (oldGameMode != gameMode) {
+   ChangeGameModeEvent event = new ChangeGameModeEvent(gameMode);
+   componentAccessor.invoke(playerRef, event);
+   if (event.isCancelled()) {
+      return;  // Le changement de mode de jeu est bloqué
+   }
+
+   setGameModeInternal(playerRef, event.getGameMode(), movementManagerComponent, componentAccessor);
+   runOnSwitchToGameMode(playerRef, gameMode);
+}
+```
+
+### Hiérarchie de classes
+
+```
+EcsEvent (abstrait)
+  └── CancellableEcsEvent (abstrait)
+       └── ChangeGameModeEvent
+```
+
+### Import GameMode
+
+```java
+import com.hypixel.hytale.protocol.GameMode;
+```
+
+## Test
+
+> **Testé :** 17 janvier 2026 - Vérifié avec le plugin doc-test
+
+Pour tester cet événement :
+1. Exécutez `/doctest test-change-game-mode-event`
+2. Changez votre mode de jeu avec `/gamemode creative`, `/gamemode survival`, `/gamemode adventure`, ou `/gamemode spectator`
+3. L'événement devrait se déclencher et afficher les détails dans le chat
+
 ## Référence source
 
 - **Classe** : `com.hypixel.hytale.server.core.event.events.ecs.ChangeGameModeEvent`
 - **Source** : `decompiled/com/hypixel/hytale/server/core/event/events/ecs/ChangeGameModeEvent.java`
 - **Ligne** : 7
 - **Parent** : `CancellableEcsEvent` (`com.hypixel.hytale.component.system.CancellableEcsEvent`)
+
+> **Dernière mise à jour :** 17 janvier 2026 - Testé et vérifié. Ajout des détails internes depuis le code source décompilé.
