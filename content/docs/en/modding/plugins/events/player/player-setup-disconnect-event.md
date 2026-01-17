@@ -114,6 +114,86 @@ Common disconnect reasons during setup include:
 
 Since this event is not cancellable, it is primarily used for logging and monitoring purposes.
 
+## Internal Details
+
+### Event Processing Chain
+
+```
+Player starts connecting
+        ↓
+SetupPacketHandler handles setup phase
+        ↓
+Player disconnects during setup (abort, timeout, auth failure)
+        ↓
+SetupPacketHandler.closed() is called
+        ↓
+PlayerSetupDisconnectEvent is dispatched
+        ↓
+Listeners receive the event (informational only)
+```
+
+### Where the Event is Fired
+
+The event is fired in `SetupPacketHandler.closed()` method:
+
+```java
+// File: SetupPacketHandler.java:210-217
+@Override
+public void closed(ChannelHandlerContext ctx) {
+   super.closed(ctx);
+   IEventDispatcher<PlayerSetupDisconnectEvent, PlayerSetupDisconnectEvent> dispatcher = HytaleServer.get()
+      .getEventBus()
+      .dispatchFor(PlayerSetupDisconnectEvent.class);
+   if (dispatcher.hasListener()) {
+      dispatcher.dispatch(new PlayerSetupDisconnectEvent(this.username, this.uuid, this.auth, this.disconnectReason));
+   }
+}
+```
+
+### Class Hierarchy
+
+```
+PlayerSetupDisconnectEvent
+    └── implements IEvent<Void>
+            └── extends IBaseEvent<Void>
+```
+
+### DisconnectReason Structure
+
+The `PacketHandler.DisconnectReason` class contains:
+
+```java
+public static class DisconnectReason {
+   @Nullable private String serverDisconnectReason;  // Set when server initiates disconnect
+   @Nullable private DisconnectType clientDisconnectType;  // Set when client sends disconnect
+
+   public String getServerDisconnectReason();
+   public void setServerDisconnectReason(String serverDisconnectReason);
+   public DisconnectType getClientDisconnectType();
+   public void setClientDisconnectType(DisconnectType clientDisconnectType);
+}
+```
+
+## Testing
+
+> **Tested:** January 17, 2026 - Verified with doc-test plugin (event fires correctly)
+
+To test this event:
+1. Run `/doctest test-player-setup-disconnect-event` on the server
+2. Have a player start connecting to the server
+3. Disconnect **during** the loading screen (before entering the world)
+4. Check the server console for event details
+
+**Note:** This event is difficult to trigger manually because the setup phase window is very short. The event fires between `PlayerSetupConnectEvent` and `PlayerConnectEvent`.
+
+Example server log when event fires:
+```
+[INFO] [TestLogger] [DocTest] Player Event: PlayerSetupDisconnectEvent | Player: Username
+[INFO] [EventTracker] [DocTest] Event fired: PlayerSetupDisconnectEvent
+```
+
 ## Source Reference
+
+> **Last updated:** January 17, 2026 - Tested and verified. Added internal details from decompiled source.
 
 `decompiled/com/hypixel/hytale/server/core/event/events/player/PlayerSetupDisconnectEvent.java:9`
