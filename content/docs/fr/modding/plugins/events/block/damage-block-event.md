@@ -50,7 +50,7 @@ public class DamageBlockEvent extends CancellableEcsEvent {
 
 ## Exemple d'utilisation
 
-> **Testé** - Ce code a été vérifié avec un plugin fonctionnel.
+> **Testé :** 17 janvier 2026 - Vérifié avec le plugin doc-test. Toutes les méthodes documentées fonctionnent correctement.
 
 **Important :** Les événements ECS nécessitent une classe `EntityEventSystem` dédiée enregistrée via `getEntityStoreRegistry().registerSystem()`. Ils n'utilisent **pas** la méthode standard `EventBus.register()`.
 
@@ -208,6 +208,22 @@ event.setDamage(event.getDamage() * bonus);
 - [BreakBlockEvent](./break-block-event) - Déclenché lorsqu'un bloc est complètement casse
 - [PlaceBlockEvent](./place-block-event) - Déclenché lorsqu'un bloc est place
 - [UseBlockEvent](./use-block-event) - Déclenché lorsqu'un bloc fait l'objet d'une interaction
+
+## Test
+
+Pour tester cet événement avec le plugin doc-test :
+
+1. Exécutez `/doctest test-damage-block-event`
+2. Commencez à miner n'importe quel bloc (maintenez le clic gauche)
+3. Les détails de l'événement seront affichés dans le chat
+
+**Sortie attendue :**
+- `itemInHand` : L'outil que vous utilisez (ou null si mains nues)
+- `targetBlock` : Position [x, y, z] du bloc
+- `blockType` : Le type de bloc miné
+- `currentDamage` : Dégâts accumulés (0 au premier coup)
+- `damage` : Dégâts appliqués ce tick
+- `isCancelled` : false (sauf si un autre plugin l'a annulé)
 
 ## Référence source
 

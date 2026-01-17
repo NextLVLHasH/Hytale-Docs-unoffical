@@ -59,7 +59,7 @@ Key differences:
 
 ## Usage Example
 
-> **Tested** - This code has been verified with a working plugin.
+> **Tested:** January 17, 2026 - Verified with doc-test plugin. All documented methods work correctly.
 
 **Important:** ECS events require a dedicated `EntityEventSystem` class registered via `getEntityStoreRegistry().registerSystem()`. They do **not** use the standard `EventBus.register()` method.
 
@@ -221,6 +221,22 @@ event.setDamage(event.getDamage() * bonus);
 - [BreakBlockEvent](./break-block-event) - Fired when a block is fully broken
 - [PlaceBlockEvent](./place-block-event) - Fired when a block is placed
 - [UseBlockEvent](./use-block-event) - Fired when a block is interacted with
+
+## Testing
+
+To test this event with the doc-test plugin:
+
+1. Run `/doctest test-damage-block-event`
+2. Start mining any block (hold left click)
+3. The event details will be displayed in chat
+
+**Expected output:**
+- `itemInHand`: The tool you're using (or null if bare hands)
+- `targetBlock`: Position [x, y, z] of the block
+- `blockType`: The type of block being mined
+- `currentDamage`: Accumulated damage (0 on first hit)
+- `damage`: Damage being applied this tick
+- `isCancelled`: false (unless another plugin cancelled it)
 
 ## Source Reference
 
