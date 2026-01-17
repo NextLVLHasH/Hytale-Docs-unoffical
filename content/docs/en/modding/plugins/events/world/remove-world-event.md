@@ -209,8 +209,75 @@ When the event is cancelled:
 - [StartWorldEvent](./start-world-event.md) - Fired when a world starts
 - [AllWorldsLoadedEvent](./all-worlds-loaded-event.md) - Fired when all configured worlds have been loaded
 
+## Practical Examples
+
+### Listening for World Removal (Verified Working)
+
+```java
+// Register a global listener for RemoveWorldEvent
+eventBus.registerGlobal(RemoveWorldEvent.class, event -> {
+    String worldName = event.getWorld().getName();
+    RemoveWorldEvent.RemovalReason reason = event.getRemovalReason();
+    boolean cancelled = event.isCancelled();
+
+    System.out.println("RemoveWorldEvent fired!");
+    System.out.println("  World: " + worldName);
+    System.out.println("  Reason: " + reason.name());
+    System.out.println("  Cancelled: " + cancelled);
+});
+```
+
+### Triggering the Event Programmatically
+
+```java
+// RemoveWorldEvent is fired when calling Universe.removeWorld()
+Universe universe = Universe.get();
+
+// GENERAL removal - can be cancelled by listeners
+boolean removed = universe.removeWorld("world_name");
+if (removed) {
+    System.out.println("World removed successfully");
+} else {
+    System.out.println("World removal was cancelled by a listener");
+}
+
+// EXCEPTIONAL removal - cannot be cancelled, used for error recovery
+universe.removeWorldExceptionally("world_name");
+```
+
+### Where the Event is Fired (Internal)
+
+The event is fired in two places in `Universe.java`:
+
+1. **`Universe.removeWorld(String name)`** (line ~537-561) - Fires with `RemovalReason.GENERAL`, checks `isCancelled()` and returns `false` if cancelled
+2. **`Universe.removeWorldExceptionally(String name)`** (line ~563-583) - Fires with `RemovalReason.EXCEPTIONAL`, ignores cancellation
+
+## Testing
+
+> **Tested:** January 18, 2026 - Verified with doc-test plugin
+
+To test this event:
+
+1. Create a test world first:
+   ```
+   /world create doctest_temp_world
+   ```
+
+2. Run the test command:
+   ```
+   /doctest test-remove-world-event
+   ```
+
+3. The command will remove the test world and display event details
+
+**Expected output:**
+- `[SUCCESS] RemoveWorldEvent detected!`
+- Event details including world name, removalReason (GENERAL), and isCancelled state
+
 ## Source Reference
 
 - **Event Definition:** `decompiled/com/hypixel/hytale/server/core/universe/world/events/RemoveWorldEvent.java`
 - **Parent Class:** `decompiled/com/hypixel/hytale/server/core/universe/world/events/WorldEvent.java`
 - **Cancellable Interface:** `decompiled/com/hypixel/hytale/event/ICancellable.java`
+
+> **Last updated:** January 18, 2026 - Tested and verified. Added practical examples and test instructions.
