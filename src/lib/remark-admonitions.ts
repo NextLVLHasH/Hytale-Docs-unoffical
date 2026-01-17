@@ -16,6 +16,19 @@ const TYPE_MAP: Record<string, string> = {
   caution: "warning",
 };
 
+// Helper to check if a paragraph contains closing :::
+function paragraphContainsClosing(node: Paragraph): boolean {
+  for (const child of node.children) {
+    if (child.type === "text") {
+      const text = (child as Text).value;
+      if (text.includes("\n:::") || text.trim() === ":::" || text.endsWith(":::")) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export function remarkAdmonitions() {
   return (tree: Root) => {
     const nodesToProcess: Array<{
@@ -47,26 +60,20 @@ export function remarkAdmonitions() {
           const titleMatch = afterType.split("\n")[0].trim();
           const title = titleMatch || undefined;
 
-          // Find the closing ::: - it could be in this paragraph or a later one
+          // Find the closing ::: - check current paragraph first (all children)
           let endIndex = -1;
 
-          // Check if ::: is in the current paragraph text (self-contained admonition)
-          if (text.includes("\n:::")) {
+          if (paragraphContainsClosing(node)) {
+            // Self-contained admonition (opening and closing in same paragraph)
             endIndex = index;
           } else {
             // Look for closing ::: in subsequent nodes
-            // Continue searching even past non-paragraph nodes (like lists)
             for (let i = index + 1; i < parent.children.length; i++) {
               const child = parent.children[i];
               if (child.type === "paragraph") {
-                const childFirst = child.children?.[0];
-                if (childFirst?.type === "text") {
-                  const childText = (childFirst as Text).value;
-                  // Check if this paragraph is the closing ::: or contains it
-                  if (childText.trim() === ":::" || childText.startsWith(":::\n") || childText.includes("\n:::")) {
-                    endIndex = i;
-                    break;
-                  }
+                if (paragraphContainsClosing(child)) {
+                  endIndex = i;
+                  break;
                 }
               }
               // Skip other node types (lists, code blocks, etc.) - they become content
@@ -89,63 +96,107 @@ export function remarkAdmonitions() {
 
     // Second pass: replace admonition blocks (in reverse order to maintain indices)
     nodesToProcess.reverse().forEach(({ parent, startIndex, endIndex, type, title }) => {
-      // Extract content from the paragraphs
       const contentNodes: any[] = [];
+      const isSelfContained = startIndex === endIndex;
 
-      for (let i = startIndex; i <= endIndex; i++) {
-        const node = parent.children[i];
+      if (isSelfContained) {
+        // Everything is in one paragraph - extract content between opening and closing
+        const node = parent.children[startIndex];
+        if (node.type === "paragraph" && node.children?.length > 0) {
+          const newChildren: any[] = [];
 
-        if (i === startIndex) {
-          // For the opening paragraph, we need to remove the :::type line
-          // but preserve all other children (including bold, links, etc.)
-          if (node.type === "paragraph" && node.children?.length > 0) {
-            const firstChild = node.children[0];
-            if (firstChild?.type === "text") {
-              const text = (firstChild as Text).value;
-              const lines = text.split("\n");
-              // Keep the remaining text without trimming to preserve spacing before bold/links
-              const remainingText = lines.slice(1).join("\n");
+          for (let i = 0; i < node.children.length; i++) {
+            const child = node.children[i];
 
-              if (remainingText.trim() || node.children.length > 1) {
-                // Create new paragraph with remaining content
-                const newChildren = remainingText
-                  ? [{ type: "text", value: remainingText }, ...node.children.slice(1)]
-                  : node.children.slice(1);
+            if (child.type === "text") {
+              let text = (child as Text).value;
 
-                if (newChildren.length > 0) {
-                  contentNodes.push({
-                    type: "paragraph",
-                    children: newChildren,
-                  });
-                }
+              if (i === 0) {
+                // First text child - remove opening :::type line
+                const lines = text.split("\n");
+                text = lines.slice(1).join("\n");
               }
+
+              // Remove closing ::: from any text node
+              text = text.replace(/\n:::$/, "").replace(/:::$/, "");
+
+              if (text) {
+                newChildren.push({ type: "text", value: text });
+              }
+            } else {
+              // Keep non-text children (strong, link, etc.) as-is
+              newChildren.push(child);
             }
           }
-        } else if (i === endIndex) {
-          // For the closing paragraph, remove the ::: but keep other content
-          if (node.type === "paragraph" && node.children?.length > 0) {
-            const lastChild = node.children[node.children.length - 1];
-            if (lastChild?.type === "text") {
-              const text = (lastChild as Text).value;
-              const cleanedText = text.replace(/\n?:::$/, "").replace(/^:::$/, "").trim();
 
-              if (cleanedText || node.children.length > 1) {
-                const newChildren = cleanedText
-                  ? [...node.children.slice(0, -1), { type: "text", value: cleanedText }]
-                  : node.children.slice(0, -1);
+          if (newChildren.length > 0) {
+            contentNodes.push({
+              type: "paragraph",
+              children: newChildren,
+            });
+          }
+        }
+      } else {
+        // Multi-paragraph admonition
+        for (let i = startIndex; i <= endIndex; i++) {
+          const node = parent.children[i];
 
-                if (newChildren.length > 0 && !(newChildren.length === 1 && (newChildren[0] as Text).value === "")) {
-                  contentNodes.push({
-                    type: "paragraph",
-                    children: newChildren,
-                  });
+          if (i === startIndex) {
+            // Opening paragraph - remove :::type line
+            if (node.type === "paragraph" && node.children?.length > 0) {
+              const newChildren: any[] = [];
+
+              for (let j = 0; j < node.children.length; j++) {
+                const child = node.children[j];
+
+                if (child.type === "text" && j === 0) {
+                  const text = (child as Text).value;
+                  const lines = text.split("\n");
+                  const remainingText = lines.slice(1).join("\n");
+                  if (remainingText) {
+                    newChildren.push({ type: "text", value: remainingText });
+                  }
+                } else {
+                  newChildren.push(child);
                 }
               }
+
+              if (newChildren.length > 0) {
+                contentNodes.push({
+                  type: "paragraph",
+                  children: newChildren,
+                });
+              }
             }
+          } else if (i === endIndex) {
+            // Closing paragraph - remove :::
+            if (node.type === "paragraph" && node.children?.length > 0) {
+              const newChildren: any[] = [];
+
+              for (const child of node.children) {
+                if (child.type === "text") {
+                  const text = (child as Text).value
+                    .replace(/\n?:::$/, "")
+                    .replace(/^:::$/, "");
+                  if (text.trim()) {
+                    newChildren.push({ type: "text", value: text });
+                  }
+                } else {
+                  newChildren.push(child);
+                }
+              }
+
+              if (newChildren.length > 0) {
+                contentNodes.push({
+                  type: "paragraph",
+                  children: newChildren,
+                });
+              }
+            }
+          } else {
+            // Intermediate nodes - keep as-is
+            contentNodes.push(node);
           }
-        } else {
-          // Keep intermediate nodes as-is
-          contentNodes.push(node);
         }
       }
 
