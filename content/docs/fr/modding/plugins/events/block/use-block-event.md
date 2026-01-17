@@ -6,6 +6,8 @@ sidebar_label: UseBlockEvent
 
 # UseBlockEvent
 
+> **Testé :** 17 janvier 2026 - Vérifié avec le plugin doc-test. Toutes les méthodes documentées fonctionnent correctement.
+
 Un événement de base abstrait déclenché lorsqu'un bloc est utilise/interagi. Cet événement possede deux classes internes : `UseBlockEvent.Pre` (annulable, se déclenché avant l'interaction) et `UseBlockEvent.Post` (non annulable, se déclenché apres l'interaction). Utilisez cet événement pour gerer les interactions de blocs comme l'ouverture de conteneurs, l'activation de mecanismes, ou les comportements de blocs personnalises.
 
 ## Informations sur l'événement
@@ -272,6 +274,58 @@ L'entite tente d'utiliser le bloc
 - [BreakBlockEvent](./break-block-event) - Declenche lorsqu'un bloc est casse
 - [PlaceBlockEvent](./place-block-event) - Declenche lorsqu'un bloc est place
 - [DamageBlockEvent](./damage-block-event) - Declenche lorsqu'un bloc subit des degats
+
+## Détails internes
+
+### Où l'événement est déclenché
+
+Le `UseBlockEvent` est déclenché dans `UseBlockInteraction.doInteraction()` :
+
+**Fichier :** `com/hypixel/hytale/server/core/modules/interaction/interaction/config/client/UseBlockInteraction.java`
+
+```java
+// Événement Pre (ligne 68-73)
+UseBlockEvent.Pre event = new UseBlockEvent.Pre(type, context, targetBlock, blockType);
+commandBuffer.invoke(ref, event);
+if (event.isCancelled()) {
+    context.getState().state = InteractionState.Failed;
+    return;
+}
+
+// Événement Post (ligne 79-84)
+UseBlockEvent.Post event = new UseBlockEvent.Post(type, context, targetBlock, blockType);
+commandBuffer.invoke(ref, event);
+```
+
+### Implémentation de l'annulation
+
+Lorsque `UseBlockEvent.Pre` est annulé :
+1. L'état d'interaction est défini sur `InteractionState.Failed`
+2. La méthode retourne immédiatement
+3. La `RootInteraction` du bloc n'est **jamais exécutée**
+4. `UseBlockEvent.Post` n'est **jamais déclenché**
+
+### Hiérarchie de classes
+
+```
+EcsEvent (abstract)
+└── UseBlockEvent (abstract)
+    ├── UseBlockEvent.Pre (final, implements ICancellableEcsEvent)
+    └── UseBlockEvent.Post (final)
+```
+
+## Test
+
+Pour tester cet événement avec le plugin doc-test :
+
+```
+/doctest test-use-block-event
+```
+
+1. Exécutez la commande ci-dessus
+2. Trouvez un bloc interactif (conteneur, levier, porte, etc.)
+3. Faites un clic droit (utiliser) sur le bloc
+4. Les détails de l'événement devraient apparaître dans le chat, confirmant que Pre et Post ont été déclenchés
 
 ## Référence source
 

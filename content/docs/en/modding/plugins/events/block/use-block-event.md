@@ -6,6 +6,8 @@ sidebar_label: UseBlockEvent
 
 # UseBlockEvent
 
+> **Tested:** January 17, 2026 - Verified with doc-test plugin. All documented methods work correctly.
+
 An abstract base event fired when a block is used/interacted with. This event has two inner classes: `UseBlockEvent.Pre` (cancellable, fires before the interaction) and `UseBlockEvent.Post` (non-cancellable, fires after the interaction). Use this event to handle block interactions like opening containers, activating mechanisms, or custom block behaviors.
 
 ## Event Information
@@ -272,6 +274,58 @@ Entity attempts to use block
 - [BreakBlockEvent](./break-block-event) - Fired when a block is broken
 - [PlaceBlockEvent](./place-block-event) - Fired when a block is placed
 - [DamageBlockEvent](./damage-block-event) - Fired when a block takes damage
+
+## Internal Details
+
+### Where the Event is Fired
+
+The `UseBlockEvent` is fired in `UseBlockInteraction.doInteraction()`:
+
+**File:** `com/hypixel/hytale/server/core/modules/interaction/interaction/config/client/UseBlockInteraction.java`
+
+```java
+// Pre event (line 68-73)
+UseBlockEvent.Pre event = new UseBlockEvent.Pre(type, context, targetBlock, blockType);
+commandBuffer.invoke(ref, event);
+if (event.isCancelled()) {
+    context.getState().state = InteractionState.Failed;
+    return;
+}
+
+// Post event (line 79-84)
+UseBlockEvent.Post event = new UseBlockEvent.Post(type, context, targetBlock, blockType);
+commandBuffer.invoke(ref, event);
+```
+
+### Cancellation Implementation
+
+When `UseBlockEvent.Pre` is cancelled:
+1. The interaction state is set to `InteractionState.Failed`
+2. The method returns immediately
+3. The block's `RootInteraction` is **never executed**
+4. `UseBlockEvent.Post` is **never fired**
+
+### Class Hierarchy
+
+```
+EcsEvent (abstract)
+└── UseBlockEvent (abstract)
+    ├── UseBlockEvent.Pre (final, implements ICancellableEcsEvent)
+    └── UseBlockEvent.Post (final)
+```
+
+## Testing
+
+To test this event with the doc-test plugin:
+
+```
+/doctest test-use-block-event
+```
+
+1. Run the command above
+2. Find an interactable block (container, lever, door, etc.)
+3. Right-click (use) the block
+4. The event details should appear in chat, confirming both Pre and Post events fired
 
 ## Source Reference
 

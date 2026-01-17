@@ -142,7 +142,7 @@ export const sidebarConfig: SidebarItem[] = [
                   { titleKey: "breakBlockEvent", href: "/docs/modding/plugins/events/block/break-block-event", verified: true },
                   { titleKey: "placeBlockEvent", href: "/docs/modding/plugins/events/block/place-block-event", verified: true },
                   { titleKey: "damageBlockEvent", href: "/docs/modding/plugins/events/block/damage-block-event", verified: true },
-                  { titleKey: "useBlockEvent", href: "/docs/modding/plugins/events/block/use-block-event" },
+                  { titleKey: "useBlockEvent", href: "/docs/modding/plugins/events/block/use-block-event", verified: true },
                 ],
               },
               {
