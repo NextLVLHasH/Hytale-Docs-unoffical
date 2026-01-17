@@ -160,6 +160,83 @@ This event fires very early in the connection process, before the player entity 
 
 The `referToServer` methods allow you to redirect players to different servers in a network, passing optional data that will be available on the destination server.
 
+## Testing
+
+> **Tested:** January 17, 2026 - Verified with doc-test plugin
+
+To test this event:
+1. Run `/doctest test-player-setup-connect-event`
+2. Have another player connect to the server (or disconnect and reconnect yourself)
+3. Check the server console for detailed output
+
+All documented methods have been verified:
+- `getUsername()` - Returns the player's username
+- `getUuid()` - Returns the player's UUID
+- `getPacketHandler()` - Returns SetupPacketHandler instance
+- `getAuth()` - Returns PlayerAuthentication object
+- `isReferralConnection()` - Returns false for normal connections
+- `getReferralData()` - Returns null for non-referral connections
+- `getReferralSource()` - Returns null for non-referral connections
+- `getClientReferral()` - Returns null when no redirection is set
+- `isCancelled()` - Returns false by default
+- `getReason()` - Returns default message "You have been disconnected from the server!"
+- `toString()` - Returns complete event representation
+
+## Internal Details
+
+### Where the Event is Fired
+
+The event is fired in `SetupPacketHandler.registered0()` at line 130-135:
+
+```java
+// decompiled/com/hypixel/hytale/server/core/io/handlers/SetupPacketHandler.java:130
+PlayerSetupConnectEvent event = HytaleServer.get()
+   .getEventBus()
+   .<Void, PlayerSetupConnectEvent>dispatchFor(PlayerSetupConnectEvent.class)
+   .dispatch(new PlayerSetupConnectEvent(this, this.username, this.uuid, this.auth, this.referralData, this.referralSource));
+```
+
+### Cancellation Implementation
+
+When the event is cancelled, the connection is immediately terminated:
+
+```java
+// SetupPacketHandler.java:135-136
+if (event.isCancelled()) {
+    this.disconnect(event.getReason());
+    return;
+}
+```
+
+### Event Processing Chain
+
+```
+Player attempts connection
+        ↓
+Authentication completes
+        ↓
+SetupPacketHandler.registered0() called
+        ↓
+PlayerSetupConnectEvent dispatched
+        ↓
+    ┌───────────────────────────────┐
+    │ Plugin handlers execute       │
+    │ Can: cancel, setReason,       │
+    │      referToServer            │
+    └───────────────────────────────┘
+        ↓
+    isCancelled()?
+    ├─ YES → disconnect(reason)
+    │
+    └─ NO → clientReferral set?
+           ├─ YES → send referral packet to client
+           │
+           └─ NO → continue normal connection
+                   (compression, world settings, assets)
+```
+
 ## Source Reference
 
 `decompiled/com/hypixel/hytale/server/core/event/events/player/PlayerSetupConnectEvent.java:16`
+
+> **Last updated:** January 17, 2026 - Tested and verified. Added internal details and testing section.

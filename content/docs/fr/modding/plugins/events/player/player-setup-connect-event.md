@@ -153,13 +153,91 @@ eventBus.register(EventPriority.EARLY, PlayerSetupConnectEvent.class, event -> {
 
 ## Notes
 
-Cet événement se déclenché tres tot dans le processus de connexion, avant que l'entite du joueur ne soit créée. Utilisez-le pour :
+Cet événement se déclenche très tôt dans le processus de connexion, avant que l'entité du joueur ne soit créée. Utilisez-le pour :
 - La validation de connexion
-- Les verifications d'authentification
+- Les vérifications d'authentification
 - Les transferts de serveur
 
-Les methodes `referToServer` vous permettent de rediriger les joueurs vers differents serveurs dans un reseau, en passant des donnees optionnelles qui seront disponibles sur le serveur de destination.
+Les méthodes `referToServer` vous permettent de rediriger les joueurs vers différents serveurs dans un réseau, en passant des données optionnelles qui seront disponibles sur le serveur de destination.
+
+## Test
+
+> **Testé :** 17 janvier 2026 - Vérifié avec le plugin doc-test
+
+Pour tester cet événement :
+1. Exécutez `/doctest test-player-setup-connect-event`
+2. Faites connecter un autre joueur au serveur (ou déconnectez-vous et reconnectez-vous)
+3. Consultez la console du serveur pour les détails
+
+Toutes les méthodes documentées ont été vérifiées :
+- `getUsername()` - Retourne le nom d'utilisateur du joueur
+- `getUuid()` - Retourne l'UUID du joueur
+- `getPacketHandler()` - Retourne l'instance SetupPacketHandler
+- `getAuth()` - Retourne l'objet PlayerAuthentication
+- `isReferralConnection()` - Retourne false pour les connexions normales
+- `getReferralData()` - Retourne null pour les connexions non-référées
+- `getReferralSource()` - Retourne null pour les connexions non-référées
+- `getClientReferral()` - Retourne null quand aucune redirection n'est définie
+- `isCancelled()` - Retourne false par défaut
+- `getReason()` - Retourne le message par défaut "You have been disconnected from the server!"
+- `toString()` - Retourne la représentation complète de l'événement
+
+## Détails internes
+
+### Où l'événement est déclenché
+
+L'événement est déclenché dans `SetupPacketHandler.registered0()` à la ligne 130-135 :
+
+```java
+// decompiled/com/hypixel/hytale/server/core/io/handlers/SetupPacketHandler.java:130
+PlayerSetupConnectEvent event = HytaleServer.get()
+   .getEventBus()
+   .<Void, PlayerSetupConnectEvent>dispatchFor(PlayerSetupConnectEvent.class)
+   .dispatch(new PlayerSetupConnectEvent(this, this.username, this.uuid, this.auth, this.referralData, this.referralSource));
+```
+
+### Implémentation de l'annulation
+
+Quand l'événement est annulé, la connexion est immédiatement terminée :
+
+```java
+// SetupPacketHandler.java:135-136
+if (event.isCancelled()) {
+    this.disconnect(event.getReason());
+    return;
+}
+```
+
+### Chaîne de traitement de l'événement
+
+```
+Le joueur tente une connexion
+        ↓
+L'authentification se termine
+        ↓
+SetupPacketHandler.registered0() appelé
+        ↓
+PlayerSetupConnectEvent dispatché
+        ↓
+    ┌───────────────────────────────┐
+    │ Les handlers de plugin        │
+    │ s'exécutent. Peuvent :        │
+    │ cancel, setReason,            │
+    │ referToServer                 │
+    └───────────────────────────────┘
+        ↓
+    isCancelled()?
+    ├─ OUI → disconnect(reason)
+    │
+    └─ NON → clientReferral défini?
+           ├─ OUI → envoie le paquet de référence au client
+           │
+           └─ NON → continue la connexion normale
+                    (compression, paramètres monde, assets)
+```
 
 ## Référence source
 
 `decompiled/com/hypixel/hytale/server/core/event/events/player/PlayerSetupConnectEvent.java:16`
+
+> **Dernière mise à jour :** 17 janvier 2026 - Testé et vérifié. Ajout des détails internes et de la section test.
