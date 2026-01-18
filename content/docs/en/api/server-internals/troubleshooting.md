@@ -30,7 +30,7 @@ Standardize your UI to use **Groups with Backgrounds** instead of Image nodes. T
 *   Console spam of packet errors.
 
 **Why it happens:**
-Your Java code is resending the entire UI file (`builder.append(...)`) on every update tick (e.g., inside a scheduled task). Relaoding the DOM repeatedly corrupts the client's UI state.
+Your Java code is resending the entire UI file (`builder.append(...)`) on every update tick (e.g., inside a scheduled task). Reloading the DOM repeatedly corrupts the client's UI state.
 
 **The Fix:**
 Implement the **Load-Update Separation Pattern**:
