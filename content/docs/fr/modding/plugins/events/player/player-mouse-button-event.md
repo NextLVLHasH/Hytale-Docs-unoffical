@@ -6,9 +6,9 @@ sidebar_label: PlayerMouseButtonEvent
 
 # PlayerMouseButtonEvent
 
-> **Attention :** Cet événement n'est actuellement **PAS FONCTIONNEL** dans la version actuelle de Hytale. Bien que le code serveur existe et que les listeners puissent être enregistrés, le client n'envoie pas les données `mouseButton` requises dans les paquets réseau. Cet événement ne se déclenchera jamais. Voir [Résultats des tests](#résultats-des-tests) pour plus de détails.
+> **Note :** Cet événement ne se déclenche que lorsque le curseur de la souris est visible (ex: en mode caméra du dessus avec `displayCursor = true`). Il ne se déclenche pas en modes première/troisième personne standard.
 
-Déclenché lorsqu'un joueur appuie ou relache un bouton de la souris. C'est un événement annulable qui fournit des informations détaillées sur les entrees de la souris, incluant le bouton appuye, la position a l'ecran et les blocs ou entites cibles.
+Déclenché lorsqu'un joueur appuie ou relâche un bouton de la souris. C'est un événement annulable qui fournit des informations détaillées sur les entrées de la souris, incluant le bouton appuyé, la position à l'écran et les blocs ou entités ciblés.
 
 ## Informations sur l'événement
 
@@ -16,7 +16,7 @@ Déclenché lorsqu'un joueur appuie ou relache un bouton de la souris. C'est un 
 |-----------|--------|
 | **Nom complet de la classe** | `com.hypixel.hytale.server.core.event.events.player.PlayerMouseButtonEvent` |
 | **Classe parente** | `PlayerEvent<Void>` |
-| **Annulable** | Oui (mais non implémenté - voir notes) |
+| **Annulable** | Oui |
 | **Asynchrone** | Non |
 | **Fichier source** | `decompiled/com/hypixel/hytale/server/core/event/events/player/PlayerMouseButtonEvent.java:15` |
 
@@ -152,46 +152,32 @@ Le champ `screenPoint` fournit les coordonnees a l'ecran ou le clic s'est produi
 
 ## Résultats des tests
 
-> **Testé :** 17 janvier 2026 - Vérifié avec le plugin doc-test
+> **Testé :** 23 janvier 2026 - Vérifié par la communauté ([#25](https://github.com/timiliris/Hytale-Docs/issues/25))
 
-**Statut : NON FONCTIONNEL**
+**Statut : FONCTIONNEL** (quand le curseur est visible)
 
-Les tests ont révélé que cet événement **ne se déclenche jamais** dans la version actuelle de Hytale :
+> **Important :** Cet événement ne se déclenche que lorsque le curseur de la souris est visible à l'écran. Cela se produit généralement lors de l'utilisation d'un mode caméra personnalisé avec `displayCursor = true` (ex: vue du dessus). En modes première personne ou troisième personne standard où le curseur est masqué, cet événement **ne se déclenchera pas**.
 
-1. **Enregistrement du listener :** Fonctionne correctement - le listener est enregistré dans l'EventBus
-2. **Paquets client :** Le client Hytale **n'envoie pas** les données `mouseButton` dans le paquet réseau `MouseInteraction`
-3. **Code serveur :** Le serveur vérifie `if (packet.mouseButton != null)` avant de dispatcher l'événement - cette condition n'est jamais remplie
-
-### Pourquoi ça ne fonctionne pas
-
-Le code de dispatch dans `InteractionModule.java:866-884` :
+Cet événement a été confirmé fonctionnel par la communauté. Voici un exemple fonctionnel utilisant une vue caméra du dessus :
 
 ```java
-if (packet.mouseButton != null) {  // Toujours false !
-    IEventDispatcher<PlayerMouseButtonEvent, PlayerMouseButtonEvent> dispatcher =
-        HytaleServer.get().getEventBus().dispatchFor(PlayerMouseButtonEvent.class);
-    if (dispatcher.hasListener()) {
-        dispatcher.dispatch(new PlayerMouseButtonEvent(...));
+getEventRegistry().registerGlobal(PlayerMouseButtonEvent.class, event -> {
+    MouseButtonEvent mouseEvent = event.getMouseButton();
+
+    if (mouseEvent.mouseButtonType != MouseButtonType.Left || mouseEvent.state != MouseButtonState.Pressed) {
+        return;
     }
-}
+
+    Player player = event.getPlayer();
+    Vector3i blockPos = event.getTargetBlock();
+
+    player.sendMessage(Message.raw("Clic détecté à : " + blockPos.toString()));
+});
 ```
 
-Le paquet `MouseInteraction` a `mouseButton` et `mouseMotion` comme champs nullable. Actuellement, le client remplit uniquement `mouseMotion` pour le suivi du mouvement de la souris, mais n'envoie jamais les données `mouseButton` pour les événements de clic.
+## Événements associés
 
-### Annulation non implémentée
-
-Même si l'événement se déclenchait, l'annulation n'aurait **aucun effet**. Le code serveur dispatch l'événement mais ignore le résultat :
-
-```java
-// L'événement est dispatché mais le résultat est ignoré
-dispatcher.dispatch(new PlayerMouseButtonEvent(...));
-// Ceci s'exécute toujours, peu importe l'annulation :
-cameraManagerComponent.handleMouseButtonState(packet.mouseButton.mouseButtonType, ...);
-```
-
-## Alternatives
-
-Puisque cet événement ne fonctionne pas, envisagez d'utiliser :
+Pour des cas d'utilisation plus spécifiques, vous pouvez également considérer :
 - **[DamageBlockEvent](../block/damage-block-event.md)** - Se déclenche en maintenant le clic gauche sur un bloc
 - **[BreakBlockEvent](../block/break-block-event.md)** - Se déclenche quand un bloc est cassé
 - **[PlaceBlockEvent](../block/place-block-event.md)** - Se déclenche lors du placement d'un bloc
@@ -230,4 +216,4 @@ PlayerMouseButtonEvent
 
 ---
 
-> **Dernière mise à jour :** 17 janvier 2026 - Testé et vérifié comme non fonctionnel. Ajout des résultats de test et des alternatives.
+> **Dernière mise à jour :** 23 janvier 2026 - Événement confirmé fonctionnel par les tests de la communauté ([#25](https://github.com/timiliris/Hytale-Docs/issues/25)).
