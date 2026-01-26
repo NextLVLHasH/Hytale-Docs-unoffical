@@ -168,6 +168,12 @@ export function Footer() {
                 {t("terms")}
               </Link>
               <Link
+                href="/contributors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t("contributors")}
+              </Link>
+              <Link
                 href="/docs/community/contributing"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
