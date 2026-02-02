@@ -44,3 +44,9 @@ custom-log/
 
 # Claude Code local config
 .claude/
+
+# Windows artifacts
+nul
+
+# MCP config
+.mcp.json
