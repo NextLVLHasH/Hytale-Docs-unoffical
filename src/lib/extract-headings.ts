@@ -1,8 +1,6 @@
-export interface TocItem {
-  id: string;
-  text: string;
-  level: number;
-}
+import type { TocItem } from "@/types";
+
+export type { TocItem };
 
 /**
  * Extracts headings from MDX content for table of contents

@@ -23,14 +23,7 @@ import {
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
-interface SearchResult {
-  title: string;
-  description: string;
-  href: string;
-  content: string;
-  category: string;
-}
+import type { SearchResult } from "@/types";
 
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   "Getting Started": BookOpen,

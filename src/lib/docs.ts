@@ -1,15 +1,11 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { DocMeta } from "@/types";
+
+export type { DocMeta };
 
 const contentDirectory = path.join(process.cwd(), "content/docs");
-
-export interface DocMeta {
-  title: string;
-  description?: string;
-  sidebarLabel?: string;
-  sidebarPosition?: number;
-}
 
 export interface Doc {
   slug: string[];

@@ -1,12 +1,9 @@
 "use client";
 
 import * as React from "react";
+import type { TocItem } from "@/types";
 
-export interface TocItem {
-  id: string;
-  text: string;
-  level: number;
-}
+export type { TocItem };
 
 interface MobileNavigationContextType {
   // Drawer states

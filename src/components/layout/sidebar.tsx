@@ -112,47 +112,41 @@ function SidebarLink({
     >
       <span className="truncate">{title}</span>
       {item.verified && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="inline-flex">
-                <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-hytale-green" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-xs">
-              {t("verified")}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-flex">
+              <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-hytale-green" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">
+            {t("verified")}
+          </TooltipContent>
+        </Tooltip>
       )}
       {item.nonFunctional && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="inline-flex">
-                <CircleOff className="h-3.5 w-3.5 shrink-0 text-destructive" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-xs max-w-48">
-              {t("nonFunctional")}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-flex">
+              <CircleOff className="h-3.5 w-3.5 shrink-0 text-destructive" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs max-w-48">
+            {t("nonFunctional")}
+          </TooltipContent>
+        </Tooltip>
       )}
       {/* Show untested icon for events that haven't been tested yet */}
       {!item.verified && !item.nonFunctional && item.href?.includes("/events/") && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="inline-flex">
-                <CircleHelp className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-xs max-w-48">
-              {t("untested")}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-flex">
+              <CircleHelp className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs max-w-48">
+            {t("untested")}
+          </TooltipContent>
+        </Tooltip>
       )}
     </Link>
   );
@@ -165,11 +159,13 @@ export function Sidebar() {
   return (
     <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-72 xl:w-80 2xl:w-96 shrink-0 border-r border-border lg:block">
       <ScrollArea className="h-full py-4 pr-3">
-        <nav className="space-y-0.5 pl-3">
-          {sidebarConfig.map((item) => (
-            <SidebarLink key={item.titleKey} item={item} t={t} badgeT={badgeT} />
-          ))}
-        </nav>
+        <TooltipProvider>
+          <nav className="space-y-0.5 pl-3">
+            {sidebarConfig.map((item) => (
+              <SidebarLink key={item.titleKey} item={item} t={t} badgeT={badgeT} />
+            ))}
+          </nav>
+        </TooltipProvider>
         {/* Discrete ad at bottom of sidebar */}
         <div className="pl-3 pr-1">
           <SidebarAd />
@@ -185,11 +181,13 @@ export function MobileSidebar() {
 
   return (
     <ScrollArea className="h-[calc(100vh-8rem)]">
-      <nav className="space-y-1 p-4">
-        {sidebarConfig.map((item) => (
-          <SidebarLink key={item.titleKey} item={item} t={t} badgeT={badgeT} />
-        ))}
-      </nav>
+      <TooltipProvider>
+        <nav className="space-y-1 p-4">
+          {sidebarConfig.map((item) => (
+            <SidebarLink key={item.titleKey} item={item} t={t} badgeT={badgeT} />
+          ))}
+        </nav>
+      </TooltipProvider>
     </ScrollArea>
   );
 }
@@ -222,11 +220,13 @@ export function MobileSidebarDrawer() {
         </SheetHeader>
 
         <ScrollArea className="h-[calc(100vh-8rem)]">
-          <nav className="space-y-1 p-4">
-            {sidebarConfig.map((item) => (
-              <SidebarLink key={item.titleKey} item={item} t={t} badgeT={badgeT} />
-            ))}
-          </nav>
+          <TooltipProvider>
+            <nav className="space-y-1 p-4">
+              {sidebarConfig.map((item) => (
+                <SidebarLink key={item.titleKey} item={item} t={t} badgeT={badgeT} />
+              ))}
+            </nav>
+          </TooltipProvider>
         </ScrollArea>
       </SheetContent>
     </Sheet>

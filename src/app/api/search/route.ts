@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { SearchResult } from "@/types";
 
 const contentDirectory = path.join(process.cwd(), "content/docs");
 
@@ -13,15 +14,8 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
-interface SearchResult {
-  title: string;
-  description: string;
-  href: string;
-  content: string;
-  category: string;
-}
-
-interface DocMeta {
+/** Document frontmatter metadata for search indexing */
+interface SearchDocMeta {
   title?: string;
   description?: string;
   sidebar_label?: string;
@@ -69,7 +63,7 @@ function getAllDocs(locale: string = "en"): SearchResult[] {
         try {
           const fileContents = fs.readFileSync(filePath, "utf8");
           const { data, content } = matter(fileContents);
-          const meta = data as DocMeta;
+          const meta = data as SearchDocMeta;
 
           const fileName = file.replace(/\.(md|mdx)$/, "");
           let slug: string[];

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sidebarConfig, SidebarItem } from "@/config/sidebar";
 import { getAllDocSlugs, getDocBySlug } from "@/lib/docs";
+import type { TransformedSidebarItem } from "@/types";
 
 // Enable CORS for IntelliJ plugin
 const corsHeaders = {
@@ -193,7 +194,7 @@ export async function GET(request: Request) {
     return titleMap[key] || key;
   }
 
-  function transformSidebar(items: SidebarItem[]): any[] {
+  function transformSidebar(items: SidebarItem[]): TransformedSidebarItem[] {
     return items.map((item) => ({
       title: resolveTitle(item.titleKey),
       href: item.href || null,

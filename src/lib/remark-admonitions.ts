@@ -1,5 +1,5 @@
 import { visit } from "unist-util-visit";
-import type { Root, Paragraph, Text } from "mdast";
+import type { Root, Paragraph, Text, Content, Parent } from "mdast";
 
 // Custom remark plugin to handle Docusaurus-style admonitions
 // Converts :::tip, :::warning, :::info, :::danger, :::note to InfoBox components
@@ -32,7 +32,7 @@ function paragraphContainsClosing(node: Paragraph): boolean {
 export function remarkAdmonitions() {
   return (tree: Root) => {
     const nodesToProcess: Array<{
-      parent: any;
+      parent: Parent;
       startIndex: number;
       endIndex: number;
       type: string;
@@ -40,7 +40,7 @@ export function remarkAdmonitions() {
     }> = [];
 
     // First pass: identify admonition blocks
-    visit(tree, "paragraph", (node: Paragraph, index: number | undefined, parent: any) => {
+    visit(tree, "paragraph", (node: Paragraph, index: number | undefined, parent: Parent | undefined) => {
       if (index === undefined || !parent) return;
 
       const firstChild = node.children[0];
@@ -71,7 +71,7 @@ export function remarkAdmonitions() {
             for (let i = index + 1; i < parent.children.length; i++) {
               const child = parent.children[i];
               if (child.type === "paragraph") {
-                if (paragraphContainsClosing(child)) {
+                if (paragraphContainsClosing(child as Paragraph)) {
                   endIndex = i;
                   break;
                 }
@@ -96,44 +96,47 @@ export function remarkAdmonitions() {
 
     // Second pass: replace admonition blocks (in reverse order to maintain indices)
     nodesToProcess.reverse().forEach(({ parent, startIndex, endIndex, type, title }) => {
-      const contentNodes: any[] = [];
+      const contentNodes: Content[] = [];
       const isSelfContained = startIndex === endIndex;
 
       if (isSelfContained) {
         // Everything is in one paragraph - extract content between opening and closing
         const node = parent.children[startIndex];
-        if (node.type === "paragraph" && node.children?.length > 0) {
-          const newChildren: any[] = [];
+        if (node.type === "paragraph") {
+          const paragraphNode = node as Paragraph;
+          if (paragraphNode.children?.length > 0) {
+            const newChildren: Content[] = [];
 
-          for (let i = 0; i < node.children.length; i++) {
-            const child = node.children[i];
+            for (let i = 0; i < paragraphNode.children.length; i++) {
+              const child = paragraphNode.children[i];
 
-            if (child.type === "text") {
-              let text = (child as Text).value;
+              if (child.type === "text") {
+                let text = (child as Text).value;
 
-              if (i === 0) {
-                // First text child - remove opening :::type line
-                const lines = text.split("\n");
-                text = lines.slice(1).join("\n");
+                if (i === 0) {
+                  // First text child - remove opening :::type line
+                  const lines = text.split("\n");
+                  text = lines.slice(1).join("\n");
+                }
+
+                // Remove closing ::: from any text node
+                text = text.replace(/\n:::$/, "").replace(/:::$/, "");
+
+                if (text) {
+                  newChildren.push({ type: "text", value: text } as Text);
+                }
+              } else {
+                // Keep non-text children (strong, link, etc.) as-is
+                newChildren.push(child);
               }
-
-              // Remove closing ::: from any text node
-              text = text.replace(/\n:::$/, "").replace(/:::$/, "");
-
-              if (text) {
-                newChildren.push({ type: "text", value: text });
-              }
-            } else {
-              // Keep non-text children (strong, link, etc.) as-is
-              newChildren.push(child);
             }
-          }
 
-          if (newChildren.length > 0) {
-            contentNodes.push({
-              type: "paragraph",
-              children: newChildren,
-            });
+            if (newChildren.length > 0) {
+              contentNodes.push({
+                type: "paragraph",
+                children: newChildren,
+              } as Paragraph);
+            }
           }
         }
       } else {
@@ -143,59 +146,65 @@ export function remarkAdmonitions() {
 
           if (i === startIndex) {
             // Opening paragraph - remove :::type line
-            if (node.type === "paragraph" && node.children?.length > 0) {
-              const newChildren: any[] = [];
+            if (node.type === "paragraph") {
+              const paragraphNode = node as Paragraph;
+              if (paragraphNode.children?.length > 0) {
+                const newChildren: Content[] = [];
 
-              for (let j = 0; j < node.children.length; j++) {
-                const child = node.children[j];
+                for (let j = 0; j < paragraphNode.children.length; j++) {
+                  const child = paragraphNode.children[j];
 
-                if (child.type === "text" && j === 0) {
-                  const text = (child as Text).value;
-                  const lines = text.split("\n");
-                  const remainingText = lines.slice(1).join("\n");
-                  if (remainingText) {
-                    newChildren.push({ type: "text", value: remainingText });
+                  if (child.type === "text" && j === 0) {
+                    const text = (child as Text).value;
+                    const lines = text.split("\n");
+                    const remainingText = lines.slice(1).join("\n");
+                    if (remainingText) {
+                      newChildren.push({ type: "text", value: remainingText } as Text);
+                    }
+                  } else {
+                    newChildren.push(child);
                   }
-                } else {
-                  newChildren.push(child);
                 }
-              }
 
-              if (newChildren.length > 0) {
-                contentNodes.push({
-                  type: "paragraph",
-                  children: newChildren,
-                });
+                if (newChildren.length > 0) {
+                  contentNodes.push({
+                    type: "paragraph",
+                    children: newChildren,
+                  } as Paragraph);
+                }
               }
             }
           } else if (i === endIndex) {
             // Closing paragraph - remove :::
-            if (node.type === "paragraph" && node.children?.length > 0) {
-              const newChildren: any[] = [];
+            if (node.type === "paragraph") {
+              const paragraphNode = node as Paragraph;
+              if (paragraphNode.children?.length > 0) {
+                const newChildren: Content[] = [];
 
-              for (const child of node.children) {
-                if (child.type === "text") {
-                  const text = (child as Text).value
-                    .replace(/\n?:::$/, "")
-                    .replace(/^:::$/, "");
-                  if (text.trim()) {
-                    newChildren.push({ type: "text", value: text });
+                for (const child of paragraphNode.children) {
+                  if (child.type === "text") {
+                    const text = (child as Text).value
+                      .replace(/\n?:::$/, "")
+                      .replace(/^:::$/, "");
+                    if (text.trim()) {
+                      newChildren.push({ type: "text", value: text } as Text);
+                    }
+                  } else {
+                    newChildren.push(child);
                   }
-                } else {
-                  newChildren.push(child);
                 }
-              }
 
-              if (newChildren.length > 0) {
-                contentNodes.push({
-                  type: "paragraph",
-                  children: newChildren,
-                });
+                if (newChildren.length > 0) {
+                  contentNodes.push({
+                    type: "paragraph",
+                    children: newChildren,
+                  } as Paragraph);
+                }
               }
             }
           } else {
             // Intermediate nodes - keep as-is
-            contentNodes.push(node);
+            contentNodes.push(node as Content);
           }
         }
       }
@@ -225,7 +234,7 @@ export function remarkAdmonitions() {
       };
 
       // Replace the nodes
-      parent.children.splice(startIndex, endIndex - startIndex + 1, infoBoxNode);
+      parent.children.splice(startIndex, endIndex - startIndex + 1, infoBoxNode as Content);
     });
   };
 }
