@@ -6,7 +6,7 @@ Community documentation and wiki for [Hytale](https://hytale.com), the upcoming 
 
 ## Features
 
-- **Multilingual** - Full support for English and French
+- **Multilingual** - Full support for English, French and Spanish 
 - **Documentation** - Comprehensive guides for gameplay, modding, servers, and API
 - **Interactive Tools** - Server calculator, project generator, JSON validator
 - **Dark/Light Mode** - Theme support with system preference detection
@@ -73,11 +73,13 @@ src/
 ├── content/              # MDX documentation files
 │   └── docs/
 │       ├── en/           # English docs
+│       └── es/           # Spanish docs
 │       └── fr/           # French docs
 ├── i18n/                 # Internationalization config
 ├── lib/                  # Utilities
 └── messages/             # Translation files
     ├── en.json
+    ├── es.json
     └── fr.json
 ```
 
