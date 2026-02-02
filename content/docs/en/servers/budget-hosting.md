@@ -3,22 +3,27 @@ id: budget-hosting
 title: Budget Server Hosting Guide
 sidebar_label: Budget Hosting
 sidebar_position: 5
-description: How to host a Hytale server on a budget - free and low-cost options compared
+description: How to host a Hytale server on a budget - free and low-cost options
 ---
 
 # Budget Server Hosting Guide
 
-Hosting a Hytale server does not have to be expensive. Whether you want to play with friends or run a small community server, there are many free and low-cost options available. This guide compares all your options and helps you choose the best solution for your budget.
+Hosting a Hytale server does not have to be expensive. Whether you want to play with friends or run a small community server, there are several free and low-cost options available.
 
-## Hosting Options Comparison
+:::info Partnership Coming Soon
+We are currently finalizing an **exclusive partnership with a French hosting company** to offer you quality Hytale server hosting at competitive prices. Stay tuned for the official announcement!
+
+Join our [Discord](https://discord.gg/yAjaFBH4Y8) to be the first to know when this partnership launches.
+:::
+
+## Hosting Options Overview
 
 | Option | Monthly Cost | Max Players | Difficulty | Control |
 |--------|--------------|-------------|------------|---------|
 | Personal PC | Free | 5-10 | Easy | Full |
-| Budget VPS | $5-15 | 10-30 | Medium | Full |
-| Budget Game Host | $3-10 | 10-20 | Easy | Limited |
 | Oracle Cloud Free | Free | 10-15 | Hard | Full |
 | Raspberry Pi 5 | ~$100 (one-time) | 5-8 | Medium | Full |
+| Partner Hosting | Coming Soon | TBA | Easy | TBA |
 
 ## Option 1: Host on Your PC
 
@@ -63,129 +68,7 @@ java -Xms4G -Xmx4G -jar hytale-server.jar
 If your IP address changes frequently, use a free Dynamic DNS service like No-IP or DuckDNS to get a consistent hostname.
 :::
 
-## Option 2: Budget VPS Providers
-
-Virtual Private Servers offer the best balance of cost, performance, and control.
-
-### Recommended Budget VPS Providers
-
-| Provider | Price | RAM | CPU | Region |
-|----------|-------|-----|-----|--------|
-| Contabo | $5/mo | 4GB | 4 vCPU | EU, US |
-| Hetzner | $4/mo | 4GB | 2 vCPU | EU |
-| Vultr | $6/mo | 4GB | 2 vCPU | Global |
-| DigitalOcean | $6/mo | 4GB | 2 vCPU | Global |
-| OVH VPS | $4/mo | 4GB | 2 vCPU | EU, NA |
-| Linode | $6/mo | 4GB | 2 vCPU | Global |
-
-### Quick Installation Script
-
-After setting up your VPS with Ubuntu 24.04, run this script:
-
-```bash
-#!/bin/bash
-# Hytale Server Quick Install Script for Ubuntu 24.04
-
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install Java 25 (Adoptium)
-sudo apt install -y wget apt-transport-https
-wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/adoptium.gpg
-echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
-sudo apt update
-sudo apt install -y temurin-25-jdk
-
-# Create server directory
-mkdir -p ~/hytale-server
-cd ~/hytale-server
-
-# Download server (replace with actual download URL)
-echo "Download hytale-server.jar from hytale.com and place it in ~/hytale-server/"
-
-# Create start script
-cat > start.sh << 'EOF'
-#!/bin/bash
-java -Xms4G -Xmx4G \
-  -XX:+UseG1GC \
-  -XX:+ParallelRefProcEnabled \
-  -XX:MaxGCPauseMillis=200 \
-  -jar hytale-server.jar
-EOF
-chmod +x start.sh
-
-# Configure firewall
-sudo ufw allow 5520/udp
-sudo ufw enable
-
-echo "Setup complete! Place hytale-server.jar in ~/hytale-server/ and run ./start.sh"
-```
-
-### Running as a Service
-
-Create a systemd service for automatic startup:
-
-```bash
-sudo nano /etc/systemd/system/hytale.service
-```
-
-```ini
-[Unit]
-Description=Hytale Server
-After=network.target
-
-[Service]
-User=ubuntu
-WorkingDirectory=/home/ubuntu/hytale-server
-ExecStart=/usr/bin/java -Xms4G -Xmx4G -XX:+UseG1GC -jar hytale-server.jar
-Restart=on-failure
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-sudo systemctl enable hytale
-sudo systemctl start hytale
-```
-
-## Option 3: Budget Game Server Hosting
-
-Game server hosts provide easy-to-use panels and support, ideal for beginners.
-
-### Recommended Budget Game Hosts
-
-| Host | Price | RAM | Features |
-|------|-------|-----|----------|
-| PebbleHost | $3/mo | 2GB | Budget option, basic panel |
-| BisectHosting | $5/mo | 4GB | Good value, 24/7 support |
-| Shockbyte | $3/mo | 2GB | Budget option, instant setup |
-| Apex Hosting | $5/mo | 4GB | Reliable, good support |
-| MCProHosting | $4/mo | 3GB | Easy panel, quick setup |
-
-### Advantages
-
-- **Easy setup** - Web-based control panel
-- **24/7 support** - Help when you need it
-- **Automatic backups** - Data protection included
-- **No Linux knowledge** required
-
-### Disadvantages
-
-- **Less control** - Limited access to system settings
-- **Shared resources** - Performance may vary
-- **Higher cost per resource** compared to VPS
-- **Vendor lock-in** - Harder to migrate
-
-### When to Choose Game Hosting
-
-- Beginners with no Linux experience
-- Want quick setup without technical hassle
-- Need reliable support
-- Small community servers (under 20 players)
-
-## Option 4: Oracle Cloud Free Tier (FREE)
+## Option 2: Oracle Cloud Free Tier (FREE)
 
 Oracle Cloud offers a generous free tier that can run a Hytale server indefinitely.
 
@@ -241,12 +124,17 @@ Oracle requires a credit card for verification but will not charge you for free 
 # Connect via SSH
 ssh -i your-key.pem ubuntu@your-instance-ip
 
-# Run installation script (same as VPS section)
-# Then install using ARM-compatible Java
+# Update and install Java
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y openjdk-25-jdk
 
-# Continue with server setup...
+# Create server directory
+mkdir -p ~/hytale-server
+cd ~/hytale-server
+
+# Download and start the server
+# (Download hytale-server.jar from hytale.com)
+java -Xms4G -Xmx4G -jar hytale-server.jar
 ```
 
 ### Tips for Oracle Cloud
@@ -255,7 +143,7 @@ sudo apt install -y openjdk-25-jdk
 - **Always Free** - Ensure you select "Always Free" eligible resources
 - **Backup your data** - Oracle may terminate inactive accounts
 
-## Option 5: Raspberry Pi 5
+## Option 3: Raspberry Pi 5
 
 A one-time purchase that provides free hosting forever with minimal electricity costs.
 
@@ -327,43 +215,6 @@ simulation-distance=4
 - Initial setup complexity
 - May need cooling in warm environments
 
-## Optimizing Costs
-
-### Choose the Right Amount of RAM
-
-| Players | Minimum RAM | Recommended RAM |
-|---------|-------------|-----------------|
-| 1-5 | 2 GB | 4 GB |
-| 5-10 | 4 GB | 6 GB |
-| 10-20 | 6 GB | 8 GB |
-| 20-30 | 8 GB | 12 GB |
-
-### Reduce Server View Distance
-
-Lowering view distance significantly reduces RAM and CPU usage:
-
-```properties
-# server.properties
-view-distance=8  # Default is often 10-12
-simulation-distance=6
-```
-
-### Turn Off When Not Used
-
-For VPS hosting, consider:
-
-- **Scheduled shutdowns** - Shut down during off-hours
-- **Snapshot and destroy** - Save money when not playing for extended periods
-
-### Hosting Provider Promo Codes
-
-Many providers offer discounts:
-
-- **New customer discounts** - Often 20-50% off first month
-- **Annual billing** - Save 10-20% vs monthly
-- **Seasonal sales** - Black Friday, holidays
-- **Referral programs** - Get credits for referring friends
-
 ## Minimum Server Requirements
 
 ### Hardware Minimums
@@ -388,24 +239,14 @@ Many providers offer discounts:
 Hytale servers require SSD storage. Traditional hard drives (HDD) will cause severe lag and chunk loading issues. NVMe SSDs provide the best performance.
 :::
 
-## Final Recommendations
+## RAM Requirements by Player Count
 
-### Best Option by Budget
-
-| Monthly Budget | Best Option | Expected Players |
-|----------------|-------------|------------------|
-| $0 | Personal PC or Oracle Cloud | 5-15 |
-| $5/month | VPS (Contabo/Hetzner) | 20-30 |
-| $10/month | VPS or Game Host | 30-50 |
-| One-time $100 | Raspberry Pi 5 | 5-8 |
-
-### Decision Flowchart
-
-1. **Playing with 2-5 close friends?** -> Host on your PC
-2. **Want free hosting forever?** -> Try Oracle Cloud Free Tier
-3. **No Linux experience?** -> Use a Game Server Host
-4. **Want best value for money?** -> Get a Budget VPS
-5. **Want a fun project?** -> Build a Raspberry Pi server
+| Players | Minimum RAM | Recommended RAM |
+|---------|-------------|-----------------|
+| 1-5 | 2 GB | 4 GB |
+| 5-10 | 4 GB | 6 GB |
+| 10-20 | 6 GB | 8 GB |
+| 20-30 | 8 GB | 12 GB |
 
 ## Next Steps
 

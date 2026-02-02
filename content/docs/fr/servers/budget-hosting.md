@@ -3,22 +3,27 @@ id: hebergement-economique
 title: Guide d'Hebergement Economique
 sidebar_label: Hebergement Eco
 sidebar_position: 5
-description: Comment heberger un serveur Hytale avec un petit budget - options gratuites et economiques comparees
+description: Comment heberger un serveur Hytale avec un petit budget - options gratuites et economiques
 ---
 
 # Guide d'Hebergement Economique
 
-Heberger un serveur Hytale ne doit pas couter cher. Que vous souhaitiez jouer avec des amis ou gerer un petit serveur communautaire, de nombreuses options gratuites et economiques sont disponibles. Ce guide compare toutes vos options et vous aide a choisir la meilleure solution pour votre budget.
+Heberger un serveur Hytale ne doit pas couter cher. Que vous souhaitiez jouer avec des amis ou gerer un petit serveur communautaire, plusieurs options gratuites et economiques sont disponibles.
 
-## Comparatif des Options d'Hebergement
+:::info Partenariat a venir
+Nous finalisons actuellement un **partenariat exclusif avec une societe d'hebergement francaise** pour vous proposer un hebergement de serveurs Hytale de qualite a des prix competitifs. Restez a l'ecoute pour l'annonce officielle !
+
+Rejoignez notre [Discord](https://discord.gg/yAjaFBH4Y8) pour etre les premiers informes du lancement de ce partenariat.
+:::
+
+## Apercu des Options d'Hebergement
 
 | Option | Cout mensuel | Joueurs max | Difficulte | Controle |
 |--------|--------------|-------------|------------|----------|
 | PC personnel | Gratuit | 5-10 | Facile | Total |
-| VPS Budget | 5-15EUR | 10-30 | Moyen | Total |
-| Hebergeur Gaming Budget | 3-10EUR | 10-20 | Facile | Limite |
 | Oracle Cloud Gratuit | Gratuit | 10-15 | Difficile | Total |
 | Raspberry Pi 5 | ~100EUR (achat unique) | 5-8 | Moyen | Total |
+| Hebergement Partenaire | Bientot disponible | TBA | Facile | TBA |
 
 ## Option 1 : Heberger sur votre PC
 
@@ -63,129 +68,7 @@ java -Xms4G -Xmx4G -jar hytale-server.jar
 Si votre adresse IP change frequemment, utilisez un service DNS dynamique gratuit comme No-IP ou DuckDNS pour obtenir un nom d'hote constant.
 :::
 
-## Option 2 : Fournisseurs VPS Budget
-
-Les serveurs prives virtuels offrent le meilleur equilibre entre cout, performance et controle.
-
-### Fournisseurs VPS Budget Recommandes
-
-| Fournisseur | Prix | RAM | CPU | Region |
-|-------------|------|-----|-----|--------|
-| Contabo | 5EUR/mois | 4Go | 4 vCPU | EU, US |
-| Hetzner | 4EUR/mois | 4Go | 2 vCPU | EU |
-| Vultr | 6$/mois | 4Go | 2 vCPU | Mondial |
-| DigitalOcean | 6$/mois | 4Go | 2 vCPU | Mondial |
-| OVH VPS | 4EUR/mois | 4Go | 2 vCPU | EU, NA |
-| Linode | 6$/mois | 4Go | 2 vCPU | Mondial |
-
-### Script d'Installation Rapide
-
-Apres avoir configure votre VPS avec Ubuntu 24.04, executez ce script :
-
-```bash
-#!/bin/bash
-# Script d'installation rapide du serveur Hytale pour Ubuntu 24.04
-
-# Mise a jour du systeme
-sudo apt update && sudo apt upgrade -y
-
-# Installation de Java 25 (Adoptium)
-sudo apt install -y wget apt-transport-https
-wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/adoptium.gpg
-echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
-sudo apt update
-sudo apt install -y temurin-25-jdk
-
-# Creation du repertoire serveur
-mkdir -p ~/hytale-server
-cd ~/hytale-server
-
-# Telecharger le serveur (remplacer par l'URL de telechargement reelle)
-echo "Telechargez hytale-server.jar depuis hytale.com et placez-le dans ~/hytale-server/"
-
-# Creation du script de demarrage
-cat > start.sh << 'EOF'
-#!/bin/bash
-java -Xms4G -Xmx4G \
-  -XX:+UseG1GC \
-  -XX:+ParallelRefProcEnabled \
-  -XX:MaxGCPauseMillis=200 \
-  -jar hytale-server.jar
-EOF
-chmod +x start.sh
-
-# Configuration du pare-feu
-sudo ufw allow 5520/udp
-sudo ufw enable
-
-echo "Installation terminee ! Placez hytale-server.jar dans ~/hytale-server/ et executez ./start.sh"
-```
-
-### Execution en tant que Service
-
-Creez un service systemd pour le demarrage automatique :
-
-```bash
-sudo nano /etc/systemd/system/hytale.service
-```
-
-```ini
-[Unit]
-Description=Serveur Hytale
-After=network.target
-
-[Service]
-User=ubuntu
-WorkingDirectory=/home/ubuntu/hytale-server
-ExecStart=/usr/bin/java -Xms4G -Xmx4G -XX:+UseG1GC -jar hytale-server.jar
-Restart=on-failure
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-sudo systemctl enable hytale
-sudo systemctl start hytale
-```
-
-## Option 3 : Hebergeurs Gaming Budget
-
-Les hebergeurs de serveurs de jeux fournissent des panneaux faciles a utiliser et un support, ideal pour les debutants.
-
-### Hebergeurs Gaming Budget Recommandes
-
-| Hebergeur | Prix | RAM | Caracteristiques |
-|-----------|------|-----|------------------|
-| PebbleHost | 3$/mois | 2Go | Option budget, panneau basique |
-| BisectHosting | 5$/mois | 4Go | Bon rapport qualite-prix, support 24/7 |
-| Shockbyte | 3$/mois | 2Go | Option budget, installation instantanee |
-| Apex Hosting | 5$/mois | 4Go | Fiable, bon support |
-| MCProHosting | 4$/mois | 3Go | Panneau facile, installation rapide |
-
-### Avantages
-
-- **Installation facile** - Panneau de controle web
-- **Support 24/7** - Aide quand vous en avez besoin
-- **Sauvegardes automatiques** - Protection des donnees incluse
-- **Aucune connaissance Linux** requise
-
-### Inconvenients
-
-- **Moins de controle** - Acces limite aux parametres systeme
-- **Ressources partagees** - Les performances peuvent varier
-- **Cout plus eleve par ressource** compare au VPS
-- **Dependance au fournisseur** - Migration plus difficile
-
-### Quand choisir l'hebergement gaming
-
-- Debutants sans experience Linux
-- Souhaitent une installation rapide sans tracas technique
-- Besoin d'un support fiable
-- Petits serveurs communautaires (moins de 20 joueurs)
-
-## Option 4 : Oracle Cloud Free Tier (GRATUIT)
+## Option 2 : Oracle Cloud Free Tier (GRATUIT)
 
 Oracle Cloud offre un niveau gratuit genereux qui peut faire tourner un serveur Hytale indefiniment.
 
@@ -241,12 +124,17 @@ Oracle necessite une carte bancaire pour la verification mais ne vous facturera 
 # Connectez-vous via SSH
 ssh -i votre-cle.pem ubuntu@ip-de-votre-instance
 
-# Executez le script d'installation (meme que la section VPS)
-# Puis installez en utilisant Java compatible ARM
+# Mise a jour et installation de Java
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y openjdk-25-jdk
 
-# Continuez avec la configuration du serveur...
+# Creation du repertoire serveur
+mkdir -p ~/hytale-server
+cd ~/hytale-server
+
+# Telecharger et demarrer le serveur
+# (Telechargez hytale-server.jar depuis hytale.com)
+java -Xms4G -Xmx4G -jar hytale-server.jar
 ```
 
 ### Astuces pour Oracle Cloud
@@ -255,7 +143,7 @@ sudo apt install -y openjdk-25-jdk
 - **Always Free** - Assurez-vous de selectionner les ressources eligibles "Always Free"
 - **Sauvegardez vos donnees** - Oracle peut fermer les comptes inactifs
 
-## Option 5 : Raspberry Pi 5
+## Option 3 : Raspberry Pi 5
 
 Un achat unique qui fournit un hebergement gratuit pour toujours avec des couts d'electricite minimaux.
 
@@ -327,43 +215,6 @@ simulation-distance=4
 - Complexite de l'installation initiale
 - Peut necessiter un refroidissement dans les environnements chauds
 
-## Optimiser les Couts
-
-### Choisir la Bonne Quantite de RAM
-
-| Joueurs | RAM minimum | RAM recommandee |
-|---------|-------------|-----------------|
-| 1-5 | 2 Go | 4 Go |
-| 5-10 | 4 Go | 6 Go |
-| 10-20 | 6 Go | 8 Go |
-| 20-30 | 8 Go | 12 Go |
-
-### Reduire la Distance de Vue du Serveur
-
-Diminuer la distance de vue reduit significativement l'utilisation de RAM et CPU :
-
-```properties
-# server.properties
-view-distance=8  # La valeur par defaut est souvent 10-12
-simulation-distance=6
-```
-
-### Eteindre Quand Non Utilise
-
-Pour l'hebergement VPS, considerez :
-
-- **Arrets programmes** - Eteindre pendant les heures creuses
-- **Snapshot et destruction** - Economiser de l'argent lors de longues periodes sans jeu
-
-### Codes Promo des Hebergeurs
-
-De nombreux fournisseurs offrent des reductions :
-
-- **Reductions nouveaux clients** - Souvent 20-50% de reduction le premier mois
-- **Facturation annuelle** - Economisez 10-20% vs mensuel
-- **Ventes saisonnieres** - Black Friday, fetes
-- **Programmes de parrainage** - Obtenez des credits en parrainant des amis
-
 ## Configuration Minimale Requise
 
 ### Minimums Materiels
@@ -388,24 +239,14 @@ De nombreux fournisseurs offrent des reductions :
 Les serveurs Hytale necessitent un stockage SSD. Les disques durs traditionnels (HDD) causeront des lags severes et des problemes de chargement de chunks. Les SSD NVMe offrent les meilleures performances.
 :::
 
-## Recommandations Finales
+## Besoins en RAM par Nombre de Joueurs
 
-### Meilleure Option par Budget
-
-| Budget mensuel | Meilleure option | Joueurs attendus |
-|----------------|------------------|------------------|
-| 0EUR | PC personnel ou Oracle Cloud | 5-15 |
-| 5EUR/mois | VPS (Contabo/Hetzner) | 20-30 |
-| 10EUR/mois | VPS ou Hebergeur Gaming | 30-50 |
-| Unique 100EUR | Raspberry Pi 5 | 5-8 |
-
-### Arbre de Decision
-
-1. **Jouer avec 2-5 amis proches ?** -> Heberger sur votre PC
-2. **Voulez un hebergement gratuit pour toujours ?** -> Essayez Oracle Cloud Free Tier
-3. **Pas d'experience Linux ?** -> Utilisez un hebergeur gaming
-4. **Voulez le meilleur rapport qualite-prix ?** -> Prenez un VPS Budget
-5. **Voulez un projet amusant ?** -> Construisez un serveur Raspberry Pi
+| Joueurs | RAM minimum | RAM recommandee |
+|---------|-------------|-----------------|
+| 1-5 | 2 Go | 4 Go |
+| 5-10 | 4 Go | 6 Go |
+| 10-20 | 6 Go | 8 Go |
+| 20-30 | 8 Go | 12 Go |
 
 ## Prochaines Etapes
 
